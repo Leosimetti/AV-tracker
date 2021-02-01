@@ -19,3 +19,6 @@ def process_keyboard_event(event: keyboard.KeyboardEvent):
     insert_data(conn, f"{datetime.fromtimestamp(event.time)}?K?{category}")
 
     print(key, datetime.fromtimestamp(event.time))
+
+    # connection should be closed once not necessary
+    conn.close()

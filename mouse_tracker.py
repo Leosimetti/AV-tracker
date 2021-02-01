@@ -34,5 +34,8 @@ def process_mouse_event(event):
 
     insert_data(conn, f"{datetime.fromtimestamp(event.time)}?M?{category}")
 
+    # connection should be closed once not necessary
+    conn.close()
+
 
 
