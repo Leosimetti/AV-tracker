@@ -7,7 +7,8 @@ def prepareDB(conn):
 
     cursor.execute("DROP TABLE IF EXISTS signals;")
     cursor.execute(
-        "CREATE TABLE signals ( id INTEGER PRIMARY KEY AUTOINCREMENT,dateTIme TEXT, deviceType VARCHAR(1), actionType TEXT);")
+        "CREATE TABLE signals ( id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        " dateTIme TEXT, deviceType VARCHAR(1), actionType TEXT);")
 
     conn.commit()
 
@@ -20,6 +21,6 @@ def interact(conn, data):
     INSERT INTO signals
     (dateTime, deviceType, actionType)
     VALUES (?, ?, ?);
-    """, [sas, kek, lol])
+    """, (sas, kek, lol))
 
     conn.commit()

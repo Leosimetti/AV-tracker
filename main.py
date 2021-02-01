@@ -14,6 +14,9 @@ if __name__ == "__main__":
 
     keyboard.on_press(callback=process_keyboard_event)
     mouse.hook(callback=process_mouse_event)
-    keyboard.wait()
+
+    conn.commit()
 
     conn.close()
+    keyboard.wait()
+
