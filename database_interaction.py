@@ -30,5 +30,6 @@ def insert_data(conn: sqlite3.Connection, data):
 
 def read_signals(conn: sqlite3.Connection):
     cursor = conn.execute("SELECT id, dateTime, deviceType, actionType from signals")
+    print("{:^6}|{:^26}|{:^6}|{:6}".format("id", "dateTime", "device", "action"))
     for row in cursor:
-        print(row[0], row[1], row[2], row[3])
+        print("{:^6}|{:26}|{:^6}|{:6}".format(row[0], row[1], row[2], row[3]))
