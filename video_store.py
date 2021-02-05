@@ -1,22 +1,29 @@
-import numpy as np
+import time
 import cv2
 
-# PARAMETERS OF VIDEO
+# PARAMETERS OF VIDEO CAPTURING
 DEBUG = True
 FILENAME = 'video.avi'
 FRAMERATE = 20.0
 RESOLUTION = (640, 480)
-EXIT_KEYS = ['q', 'Q', 'й', "Й"]
+EXIT_KEYS = ['q', 'Q']
+REGULATE_TIME = True
 
 if __name__ == "__main__":
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(0)  # Choose video camera interface?
 
     # Video codec
     # TODO Test on different platforms
     fourCC = cv2.VideoWriter_fourcc(*'XVID')
     out = cv2.VideoWriter(FILENAME, fourCC, FRAMERATE, RESOLUTION)
 
+    start_time = time.time()
+    capture_duration = 5
+
     while cap.isOpened():
+        if REGULATE_TIME & int(time.time() - start_time) > capture_duration:
+            out = cv2.VideoWriter(FILENAME, fourCC, FRAMERATE, RESOLUTION)
+
         ret, frame = cap.read()
 
         if ret:
@@ -33,6 +40,7 @@ if __name__ == "__main__":
         else:
             break
 
-    # When everything done, release the capture
+    # Release everything
+    out.release()
     cap.release()
     cv2.destroyAllWindows()
