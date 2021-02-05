@@ -2,13 +2,13 @@ from datetime import datetime
 import keyboard
 import sqlite3
 
-from database_interaction import insert_data
+from db.database_interaction import insert_data
 
 endpoint = "http://some-url.com"
 
 
 def process_keyboard_event(event: keyboard.KeyboardEvent):
-    conn = sqlite3.connect('signals.sqlite')
+    conn = sqlite3.connect('db/signals.sqlite')
 
     key = str(event.name)
     if len(key) == 1:

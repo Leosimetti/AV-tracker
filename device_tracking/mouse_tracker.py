@@ -1,6 +1,6 @@
 import sqlite3
 import mouse
-from database_interaction import insert_data
+from db.database_interaction import insert_data
 from datetime import datetime
 
 endpoint = "http://some-url.com"
@@ -30,7 +30,7 @@ def process_mouse_event(event):
 
     # Due to the problem that connection can be used only in the same thread where that connection was created
     # transfer of connection from main class is not valid. Most obvious solution is to create new connection.
-    conn = sqlite3.connect('signals.sqlite')
+    conn = sqlite3.connect('db/signals.sqlite')
 
     insert_data(conn, f"{datetime.fromtimestamp(event.time)}?M?{category}")
 
