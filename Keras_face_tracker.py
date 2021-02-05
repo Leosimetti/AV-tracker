@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
         # display the resized image
         # image.show()
-        # cv2.imshow('img', img)
+        cv2.imshow('img', img)
 
         # Normalize the image
         normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
@@ -51,4 +51,4 @@ if __name__ == "__main__":
         states = ["Present", "Not present", "Distracted"]
         state_index = tensorflow.math.argmax(prediction, axis=-1)[0]
         print(f"[{states[state_index]}] {time.ctime()} {prediction}")
-        time.sleep(1)
+        # time.sleep(1)
