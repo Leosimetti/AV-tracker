@@ -26,6 +26,5 @@ if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
     determine_state(cap)
 
-
     keyboard.wait()
     conn.close()

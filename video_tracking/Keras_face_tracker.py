@@ -5,7 +5,8 @@ import cv2
 import time
 from db.video_store import *
 
-PROCESSING_FREQUENCY = 250
+PROCESSING_FREQUENCY = 255400
+DISPLAY_IMAGE = True
 
 
 def determine_state(cap):
@@ -23,48 +24,51 @@ def determine_state(cap):
     data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
 
     previous_state = None
-    frame_counter = 0
+    # frame_counter = 0
+
+    ids = 0
 
     while True:
-        if frame_counter == PROCESSING_FREQUENCY:
-            frame_counter = 0
+        # if frame_counter == PROCESSING_FREQUENCY:
+        frame_counter = 0
 
-            _, img = cap.read()
+        _, img = cap.read()
 
-            color_coverted = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            image = Image.fromarray(color_coverted)
+        color_coverted = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        image = Image.fromarray(color_coverted)
 
-            # resize the image to a 224x224 with the same strategy as in TM2:
-            # resizing the image to be at least 224x224 and then cropping from the center
-            size = (224, 224)
-            image = ImageOps.fit(image, size, Image.ANTIALIAS)
+        # resize the image to a 224x224 with the same strategy as in TM2:
+        # resizing the image to be at least 224x224 and then cropping from the center
+        size = (224, 224)
+        image = ImageOps.fit(image, size, Image.ANTIALIAS)
 
-            # turn the image into a numpy array
-            image_array = np.asarray(image)
+        # turn the image into a numpy array
+        image_array = np.asarray(image)
 
-            # Normalize the image
-            normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+        # Normalize the image
+        normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
 
-            # Load the image into the array
-            data[0] = normalized_image_array
+        # Load the image into the array
+        data[0] = normalized_image_array
 
-            # run the inference
-            prediction = model.predict(data)
-            states = ["Present", "Not present", "Distracted"]
-            state_index = tensorflow.math.argmax(prediction, axis=-1)[0]
+        # run the inference
+        prediction = model.predict(data)
+        states = ["Present", "Not present", "Distracted"]
+        state_index = tensorflow.math.argmax(prediction, axis=-1)[0]
 
-            if previous_state == None:
-                previous_state = state_index
+        if previous_state == None:
+            previous_state = state_index
 
-            elif previous_state != state_index:
-                previous_state = state_index
+        elif previous_state != state_index:
+            previous_state = state_index
+            ids += 1
 
-                # Inserting an array
-                insertImage(conn, image_array, states[state_index], image_array.shape)
+            # Inserting an array
+            insertImage(conn, image_array, states[state_index], image_array.shape)
 
-                get_image(conn, 1)
+            get_image(conn, ids).show() if DISPLAY_IMAGE else None
 
-            print(f"[{states[state_index]}] {time.ctime()} {prediction}")
-        else:
-            frame_counter += 1
-        # time.sleep(1)
+        print(f"[{states[state_index]}] {time.ctime()} {prediction}")
+        # else:
+        #     frame_counter += 1
+        time.sleep(0.21)

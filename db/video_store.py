@@ -84,7 +84,9 @@ def get_image(conn: sqlite3.Connection, id):
     size = tuple(map(lambda x: int(x), row[1].split(" ")))
 
     np_arr = np.frombuffer(img, dtype=np.uint8).reshape(size)
-    Image.fromarray(np_arr).show()
+    # Image.fromarray(np_arr).show()
+
+    return Image.fromarray(np_arr)
     # img = np.reshape(np_arr, (224,224,3))
 
 # def store_photo(photo, conn: sqlite3.Connection):
