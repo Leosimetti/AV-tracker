@@ -3,52 +3,68 @@ from PIL import Image, ImageOps
 import numpy as np
 import cv2
 import time
+from db.video_store import *
 
-# To capture video from webcam.
-cap = cv2.VideoCapture(0)
+PROCESSING_FREQUENCY = 250
 
-if __name__ == "__main__":
+
+def determine_state(cap):
+    conn = sqlite3.connect('db/signals.sqlite')
 
     # Disable scientific notation for clarity
     np.set_printoptions(suppress=True)
 
     # Load the model
-    model = tensorflow.keras.models.load_model('../models/keras_model.h5')
+    model = tensorflow.keras.models.load_model('models/keras_model.h5')
 
     # Create the array of the right shape to feed into the keras model
     # The 'length' or number of images you can put into the array is
     # determined by the first position in the shape tuple, in this case 1.
     data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
 
+    previous_state = None
+    frame_counter = 0
+
     while True:
-        _, img = cap.read()
+        if frame_counter == PROCESSING_FREQUENCY:
+            frame_counter = 0
 
-        cv2.imwrite("test_photo.jpg", img)
+            _, img = cap.read()
 
-        # Replace this with the path to your image
-        image = Image.open('test_photo.jpg')
+            color_coverted = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            image = Image.fromarray(color_coverted)
 
-        # resize the image to a 224x224 with the same strategy as in TM2:
-        # resizing the image to be at least 224x224 and then cropping from the center
-        size = (224, 224)
-        image = ImageOps.fit(image, size, Image.ANTIALIAS)
+            # resize the image to a 224x224 with the same strategy as in TM2:
+            # resizing the image to be at least 224x224 and then cropping from the center
+            size = (224, 224)
+            image = ImageOps.fit(image, size, Image.ANTIALIAS)
 
-        # turn the image into a numpy array
-        image_array = np.asarray(image)
+            # turn the image into a numpy array
+            image_array = np.asarray(image)
 
-        # display the resized image
-        # image.show()
-        cv2.imshow('img', img)
+            # Normalize the image
+            normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
 
-        # Normalize the image
-        normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+            # Load the image into the array
+            data[0] = normalized_image_array
 
-        # Load the image into the array
-        data[0] = normalized_image_array
+            # run the inference
+            prediction = model.predict(data)
+            states = ["Present", "Not present", "Distracted"]
+            state_index = tensorflow.math.argmax(prediction, axis=-1)[0]
 
-        # run the inference
-        prediction = model.predict(data)
-        states = ["Present", "Not present", "Distracted"]
-        state_index = tensorflow.math.argmax(prediction, axis=-1)[0]
-        print(f"[{states[state_index]}] {time.ctime()} {prediction}")
+            if previous_state == None:
+                previous_state = state_index
+
+            elif previous_state != state_index:
+                previous_state = state_index
+
+                # Inserting an array
+                insertImage(conn, image_array, states[state_index], image_array.shape)
+
+                get_image(conn, 1)
+
+            print(f"[{states[state_index]}] {time.ctime()} {prediction}")
+        else:
+            frame_counter += 1
         # time.sleep(1)

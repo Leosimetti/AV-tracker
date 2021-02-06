@@ -2,7 +2,8 @@ import time
 import cv2
 import sqlite3
 import datetime
-
+import numpy as np
+from PIL import Image
 ''' RESERVED
 # PARAMETERS OF VIDEO CAPTURING
 DEBUG = True
@@ -55,24 +56,36 @@ def prepareImageDB(conn: sqlite3.Connection):
     cursor.execute("DROP TABLE IF EXISTS images;")
     cursor.execute(
         "CREATE TABLE images"
-        "( id INTEGER PRIMARY KEY AUTOINCREMENT, dateTime TEXT, image BLOB);")
+        "( id INTEGER PRIMARY KEY AUTOINCREMENT, dateTime TEXT, state Text, size TEXT, image BLOB);")
 
     conn.commit()
 
 
-def insertImage(conn: sqlite3.Connection, photo):
+def insertImage(conn: sqlite3.Connection, photo, state, size):
+    photo = memoryview(photo) # AS the data is in the form of np-array
+    size = " ".join(map(lambda x: str(x), size)) # Make a tuple into a strign
+
     cursor = conn.cursor()
     dateTime = datetime.datetime.now()
 
     cursor.execute(f"""
         INSERT INTO images
-        (dateTime, image)
-        VALUES (?, ?);
-        """, [dateTime, photo])
+        (dateTime, image, state, size)
+        VALUES (?, ?, ?, ?);
+        """, [dateTime, photo, state, size])
 
     conn.commit()
 
+def get_image(conn: sqlite3.Connection, id):
+    cursor = conn.execute("SELECT image, size from images WHERE id = ?", [id])
 
-def store_photo(capture: cv2.VideoCapture, conn: sqlite3.Connection):
-    _, photo = capture.read()
-    insertImage(conn, photo)
+    row = cursor.fetchone()
+    img = row[0]
+    size = tuple(map(lambda x: int(x), row[1].split(" ")))
+
+    np_arr = np.frombuffer(img, dtype=np.uint8).reshape(size)
+    Image.fromarray(np_arr).show()
+    # img = np.reshape(np_arr, (224,224,3))
+
+# def store_photo(photo, conn: sqlite3.Connection):
+#     insertImage(conn, photo)
