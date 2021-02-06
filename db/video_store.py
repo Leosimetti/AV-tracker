@@ -1,6 +1,9 @@
 import time
 import cv2
+import sqlite3
+import datetime
 
+''' RESERVED
 # PARAMETERS OF VIDEO CAPTURING
 DEBUG = True
 FILENAME = 'video.avi'
@@ -23,7 +26,6 @@ if __name__ == "__main__":
     while cap.isOpened():
         if REGULATE_TIME & int(time.time() - start_time) > capture_duration:
             out = cv2.VideoWriter(FILENAME, fourCC, FRAMERATE, RESOLUTION)
-
         ret, frame = cap.read()
 
         if ret:
@@ -44,3 +46,33 @@ if __name__ == "__main__":
     out.release()
     cap.release()
     cv2.destroyAllWindows()
+'''
+
+
+def prepareImageDB(conn: sqlite3.Connection):
+    cursor = conn.cursor()
+
+    cursor.execute("DROP TABLE IF EXISTS images;")
+    cursor.execute(
+        "CREATE TABLE images"
+        "( id INTEGER PRIMARY KEY AUTOINCREMENT, dateTime TEXT, image BLOB);")
+
+    conn.commit()
+
+
+def insertImage(conn: sqlite3.Connection, photo):
+    cursor = conn.cursor()
+    dateTime = datetime.datetime.now()
+
+    cursor.execute(f"""
+        INSERT INTO images
+        (dateTime, image)
+        VALUES (?, ?);
+        """, [dateTime, photo])
+
+    conn.commit()
+
+
+def store_photo(capture: cv2.VideoCapture, conn: sqlite3.Connection):
+    _, photo = capture.read()
+    insertImage(conn, photo)

@@ -2,7 +2,7 @@ import sqlite3
 import queue
 
 
-def prepareDB(conn: sqlite3.Connection):
+def prepareSignalDB(conn: sqlite3.Connection):
     cursor = conn.cursor()
 
     cursor.execute("DROP TABLE IF EXISTS signals;")
