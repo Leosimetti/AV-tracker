@@ -4,6 +4,7 @@ import sqlite3
 import datetime
 import numpy as np
 from PIL import Image
+
 ''' RESERVED
 # PARAMETERS OF VIDEO CAPTURING
 DEBUG = True
@@ -61,9 +62,10 @@ def prepareImageDB(conn: sqlite3.Connection):
     conn.commit()
 
 
-def insertImage(conn: sqlite3.Connection, photo, state, size):
-    photo = memoryview(photo) # AS the data is in the form of np-array
-    size = " ".join(map(lambda x: str(x), size)) # Make a tuple into a strign
+def insertImage(photo, state, size):
+    conn = sqlite3.connect("db/signals.sqlite")
+    photo = memoryview(photo)  # AS the data is in the form of np-array
+    size = " ".join(map(lambda x: str(x), size))  # Make a tuple into a strign
 
     cursor = conn.cursor()
     dateTime = datetime.datetime.now()
@@ -75,8 +77,11 @@ def insertImage(conn: sqlite3.Connection, photo, state, size):
         """, [dateTime, photo, state, size])
 
     conn.commit()
+    conn.close()
 
-def get_image(conn: sqlite3.Connection, id):
+
+def get_image(id):
+    conn = sqlite3.connect("db/signals.sqlite")
     cursor = conn.execute("SELECT image, size from images WHERE id = ?", [id])
 
     row = cursor.fetchone()
@@ -84,10 +89,7 @@ def get_image(conn: sqlite3.Connection, id):
     size = tuple(map(lambda x: int(x), row[1].split(" ")))
 
     np_arr = np.frombuffer(img, dtype=np.uint8).reshape(size)
-    # Image.fromarray(np_arr).show()
+    conn.commit()
+    conn.close()
 
     return Image.fromarray(np_arr)
-    # img = np.reshape(np_arr, (224,224,3))
-
-# def store_photo(photo, conn: sqlite3.Connection):
-#     insertImage(conn, photo)
