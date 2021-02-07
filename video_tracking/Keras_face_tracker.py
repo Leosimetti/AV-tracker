@@ -64,9 +64,9 @@ def determine_state(cap):
             ids += 1
 
             # Inserting an array
-            insertImage(conn, image_array, states[state_index], image_array.shape)
+            insertImage(image_array, states[state_index], image_array.shape)
 
-            get_image(conn, ids).show() if DISPLAY_IMAGE else None
+            get_image(ids).show() if DISPLAY_IMAGE else None
 
         print(f"[{states[state_index]}] {time.ctime()} {prediction}")
         # else:
