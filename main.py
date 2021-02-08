@@ -13,8 +13,8 @@ DEBUG = False
 
 if __name__ == "__main__":
     conn = sqlite3.connect('db/signals.sqlite')
-    prepareSignalDB(conn)
-    prepareImageDB(conn)
+    prepare_signalDB()
+    prepare_imageDB()
 
 
     keyboard.on_press(callback=process_keyboard_event)
@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     if DEBUG:
         time.sleep(10)
-        read_signals(conn)
+        read_signals()
     # To capture video from webcam.
     cap = cv2.VideoCapture(0)
     determine_state(cap)

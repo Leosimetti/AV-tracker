@@ -16,7 +16,7 @@ def process_keyboard_event(event: keyboard.KeyboardEvent):
     else:
         category = "K_NON-TYPING"
 
-    insert_data(conn, f"{datetime.fromtimestamp(event.time)}?K?{category}")
+    insert_data(f"{datetime.fromtimestamp(event.time)}?K?{category}")
 
     print(key, datetime.fromtimestamp(event.time))
 

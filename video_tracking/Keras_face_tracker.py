@@ -64,7 +64,7 @@ def determine_state(cap):
             ids += 1
 
             # Inserting an array
-            insertImage(image_array, states[state_index], image_array.shape)
+            insert_image(image_array, states[state_index], image_array.shape)
 
             get_image(ids).show() if DISPLAY_IMAGE else None
 

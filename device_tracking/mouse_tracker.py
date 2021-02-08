@@ -28,14 +28,6 @@ def process_mouse_event(event):
         else:
             return
 
-    # Due to the problem that connection can be used only in the same thread where that connection was created
-    # transfer of connection from main class is not valid. Most obvious solution is to create new connection.
-    conn = sqlite3.connect('db/signals.sqlite')
-
-    insert_data(conn, f"{datetime.fromtimestamp(event.time)}?M?{category}")
-
-    # connection should be closed once not necessary
-    conn.close()
-
+    insert_data(f"{datetime.fromtimestamp(event.time)}?M?{category}")
 
 

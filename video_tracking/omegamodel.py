@@ -8,7 +8,7 @@ import time
 import cv2
 import numpy as np
 
-from db.video_store import insertImage, get_image
+from db.video_store import insert_image, get_image
 
 SHOW_FACE = not True
 DISPLAY_IMAGE = True
@@ -53,7 +53,7 @@ def determine_state(cap):
                 image_id += 1
                 previous_state = state
                 image_array = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                insertImage(image_array, state, image_array.shape)
+                insert_image(image_array, state, image_array.shape)
                 if DISPLAY_IMAGE:
                     get_image(image_id).show()
 

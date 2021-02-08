@@ -51,7 +51,8 @@ if __name__ == "__main__":
 '''
 
 
-def prepareImageDB(conn: sqlite3.Connection):
+def prepare_imageDB():
+    conn = sqlite3.connect('db/signals.sqlite')
     cursor = conn.cursor()
 
     cursor.execute("DROP TABLE IF EXISTS images;")
@@ -60,9 +61,10 @@ def prepareImageDB(conn: sqlite3.Connection):
         "( id INTEGER PRIMARY KEY AUTOINCREMENT, dateTime TEXT, state Text, size TEXT, image BLOB);")
 
     conn.commit()
+    conn.close()
 
 
-def insertImage(photo, state, size):
+def insert_image(photo, state, size):
     conn = sqlite3.connect("db/signals.sqlite")
     photo = memoryview(photo)  # AS the data is in the form of np-array
     size = " ".join(map(lambda x: str(x), size))  # Make a tuple into a strign
@@ -80,9 +82,9 @@ def insertImage(photo, state, size):
     conn.close()
 
 
-def get_image(id):
+def get_image(ID):
     conn = sqlite3.connect("db/signals.sqlite")
-    cursor = conn.execute("SELECT image, size from images WHERE id = ?", [id])
+    cursor = conn.execute("SELECT image, size from images WHERE id = ?", [ID])
 
     row = cursor.fetchone()
     img = row[0]
