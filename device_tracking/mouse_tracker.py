@@ -1,3 +1,4 @@
+import sqlite3
 import mouse
 from db.database_interaction import insert_data
 from datetime import datetime
