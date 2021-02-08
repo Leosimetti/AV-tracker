@@ -1,7 +1,6 @@
-import time
-import cv2
-import sqlite3
 import datetime
+import sqlite3
+
 import numpy as np
 from PIL import Image
 

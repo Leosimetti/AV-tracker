@@ -1,6 +1,3 @@
-import cv2
-import time
-
 from db.database_interaction import *
 from db.video_store import *
 from device_tracking.keyboard_tracker import process_keyboard_event, keyboard
