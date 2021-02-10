@@ -64,27 +64,24 @@ def prepare_imageDB():
     conn.close()
 
 
-def insert_image(photo, state, size):
+def insert_image(data):
     conn = sqlite3.connect("db/signals.sqlite")
-    photo = memoryview(photo)  # AS the data is in the form of np-array
-    size = " ".join(map(lambda x: str(x), size))  # Make a tuple into a strign
 
     cursor = conn.cursor()
-    dateTime = datetime.datetime.now()
 
     cursor.execute(f"""
         INSERT INTO images
         (dateTime, image, state, size)
         VALUES (?, ?, ?, ?);
-        """, [dateTime, photo, state, size])
+        """, data)
 
     conn.commit()
     conn.close()
 
 
-def get_image(ID):
+def get_image(id):
     conn = sqlite3.connect("db/signals.sqlite")
-    cursor = conn.execute("SELECT image, size from images WHERE id = ?", [ID])
+    cursor = conn.execute("SELECT image, size from images WHERE id = ?", [id])
 
     row = cursor.fetchone()
     img = row[0]
