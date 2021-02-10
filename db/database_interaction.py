@@ -19,14 +19,11 @@ def insert_data(data):
     conn = sqlite3.connect('db/signals.sqlite')
     cursor = conn.cursor()
 
-    # Split by ? instead of " " because dateTime contain space.
-    dateTime, deviceType, actionType = data.split("?")
-
     cursor.execute(f"""
     INSERT INTO signals
     (dateTime, deviceType, actionType)
     VALUES (?, ?, ?);
-    """, [dateTime, deviceType, actionType])
+    """, data)
 
     conn.commit()
     conn.close()
