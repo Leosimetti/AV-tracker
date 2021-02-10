@@ -99,7 +99,7 @@ class VideoTracker(Tracker):
                         timestamp=datetime.now()
                     )
                 )
-        time.sleep(0.2)
+            time.sleep(0.4)
 
     def track(self):
         Thread(target=self.collect_frames,
