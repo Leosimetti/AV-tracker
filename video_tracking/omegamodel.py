@@ -7,6 +7,8 @@ Created on Thu Jul  2 03:40:59 2020
 import time
 import cv2
 import numpy as np
+from datetime import datetime
+from device_tracking.video_tracker import ProcessedImageEvent
 
 from db.video_store import insert_image, get_image
 
@@ -27,7 +29,6 @@ def determine_state(cap):
         if no_errors:
             img = cv2.resize(img, None, fx=0.5, fy=0.5)
             height, width = img.shape[:2]
-            img2 = img.copy()
 
             blob = cv2.dnn.blobFromImage(cv2.resize(img, (300, 300)),
                                          1.0, (300, 300), (104.0, 117.0, 123.0))
@@ -42,7 +43,7 @@ def determine_state(cap):
                     if SHOW_FACE:
                         box = faces3[0, 0, i, 3:7] * np.array([width, height, width, height])
                         (x, y, x1, y1) = box.astype("int")
-                        cv2.rectangle(img2, (x, y), (x1, y1), (0, 0, 255), 2)
+                        cv2.rectangle(img, (x, y), (x1, y1), (0, 0, 255), 2)
 
             states = ["Absent", "Present", "Group"]
             state = states[number_of_faces if number_of_faces <= 2 else 2]
@@ -53,14 +54,14 @@ def determine_state(cap):
                 image_id += 1
                 previous_state = state
                 image_array = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                insert_image(image_array, state, image_array.shape)
+                ProcessedImageEvent(datetime.now(), image_array, state, image_array.shape).process()
                 if DISPLAY_IMAGE:
                     get_image(image_id).show()
 
             print(f"[{state}] {time.ctime()}")
 
             if SHOW_FACE:
-                cv2.imshow("dnn", img2)
+                cv2.imshow("dnn", img)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
             time.sleep(0.5)
