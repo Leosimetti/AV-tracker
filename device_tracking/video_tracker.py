@@ -28,15 +28,13 @@ class Frame:
 
 
 class DNNVideoProcessor(Thread):
-    MODEL_FILE = "models/res10_300x300_ssd_iter_140000.caffemodel"
-    CONFIG_FILE = "models/deploy.prototxt.txt"
 
-    def __init__(self, frame_queue, event_queue, debug):
+    def __init__(self, frame_queue, event_queue, model, debug):
         super(DNNVideoProcessor, self).__init__()
         self.frame_queue = frame_queue
         self.event_queue = event_queue
         self.debug = debug
-        self.model = cv2.dnn.readNetFromCaffe(self.CONFIG_FILE, self.MODEL_FILE)
+        self.model = model
         self.previous_state = None
         self.image_id = 0
 
@@ -45,25 +43,14 @@ class DNNVideoProcessor(Thread):
             frame_data = self.frame_queue.get()
             img = frame_data.image
             timestamp = frame_data.timestamp
-            img = cv2.resize(img, None, fx=0.5, fy=0.5)
-
-            blob = cv2.dnn.blobFromImage(cv2.resize(img, (300, 300)),
-                                         1.0, (300, 300), (104.0, 117.0, 123.0))
-            self.model.setInput(blob)
-            faces3 = self.model.forward()
-
-            number_of_faces = 0
-            for i in range(faces3.shape[2]):
-                confidence = faces3[0, 0, i, 2]
-                if confidence > 0.5:
-                    number_of_faces += 1
-
-            states = ["Absent", "Present", "Group"]
-            state = states[number_of_faces if number_of_faces <= 2 else 2]
+            state, debug_image = self.model.predict(img)
 
             if state != self.previous_state:
                 self.image_id += 1
-                image_array = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                if debug_image is not None:
+                    image_array = cv2.cvtColor(debug_image, cv2.COLOR_BGR2RGB)
+                else:
+                    image_array = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                 self.event_queue.put(
                     ProcessedImageEvent(
                         timestamp,
@@ -99,7 +86,7 @@ class VideoTracker(Tracker):
                         timestamp=datetime.now()
                     )
                 )
-            time.sleep(0.4)
+            time.sleep(0.2)
 
     def track(self):
         Thread(target=self.collect_frames,

@@ -7,6 +7,7 @@ from device_tracking.keyboard_tracker import KeyboardTracker
 from device_tracking.mouse_tracker import MouseTracker
 from device_tracking.video_tracker import VideoTracker, DNNVideoProcessor, ProcessedImageEvent
 from video_tracking.omegamodel import determine_state
+from models.DNN_model import DNNModel
 from queue import SimpleQueue
 
 # from video_tracking.Keras_face_tracker import determine_state
@@ -33,7 +34,8 @@ if __name__ == "__main__":
     video_processor = DNNVideoProcessor(
         frame_queue=frame_queue,
         event_queue=event_queue,
-        debug=DEBUG
+        debug=DEBUG,
+        model=DNNModel(DEBUG)
     )
     video_tracker.track()
     video_processor.start()
