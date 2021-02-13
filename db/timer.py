@@ -10,6 +10,7 @@ from db.processed_signals_db import insert_processed_data
 class Timer:
     threshold = 5
     time_left = 5
+    is_absent = True
 
     def __init__(self, new_threshold: int):
         if new_threshold > 0:
@@ -27,7 +28,10 @@ class Timer:
         while True:
             if Timer.time_left > 0:
                 insert_processed_data("Present")
+                Timer.is_absent = False
             while Timer.time_left > 0:
                 time.sleep(1)
                 Timer.time_left -= 1
-            insert_processed_data("Absent")
+            if not Timer.is_absent:
+                insert_processed_data("Absent")
+                Timer.is_absent = True
