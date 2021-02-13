@@ -3,7 +3,7 @@ from PIL import Image, ImageOps
 import numpy as np
 import cv2
 import time
-from db.video_store import *
+from db.video_data_db import *
 
 PROCESSING_FREQUENCY = 255400
 DISPLAY_IMAGE = True

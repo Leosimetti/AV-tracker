@@ -1,6 +1,6 @@
 import mouse
 from device_tracking import TrackingEvent, Tracker
-from db.database_interaction import insert_data
+from db.signals_db import insert_data
 from datetime import datetime
 
 

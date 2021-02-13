@@ -3,7 +3,7 @@ from threading import Thread
 import cv2
 from datetime import datetime
 import numpy as np
-from db.video_store import insert_image, get_image
+from db.video_data_db import insert_image, get_image
 import time
 
 

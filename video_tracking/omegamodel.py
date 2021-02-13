@@ -10,7 +10,7 @@ import numpy as np
 from datetime import datetime
 from device_tracking.video_tracker import ProcessedImageEvent
 
-from db.video_store import insert_image, get_image
+from db.video_data_db import insert_image, get_image
 
 SHOW_FACE = not True
 DISPLAY_IMAGE = True
