@@ -37,6 +37,7 @@ class DNNVideoProcessor(Thread):
         self.model = model
         self.previous_state = None
         self.image_id = 0
+        self.daemon = True
 
     def run(self):
         while True:

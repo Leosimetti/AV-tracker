@@ -2,6 +2,7 @@ import cv2
 import time
 import threading
 
+from GUI import *
 from db.processed_signals_db import *
 from db.signals_db import *
 from db.video_data_db import *
@@ -16,6 +17,7 @@ from queue import SimpleQueue
 # from video_tracking.Keras_face_tracker import determine_state
 
 DEBUG = True
+
 
 if __name__ == "__main__":
     # Preparing databases
@@ -46,14 +48,16 @@ if __name__ == "__main__":
     video_processor.start()
 
     # Start timer that help determine user presence based on K&M input singals
-    timer = threading.Thread(target=Timer.startTimer)
+    timer = threading.Thread(target=Timer.startTimer, daemon=True)
     timer.start()
 
     # For testing purposes
     # cap = cv2.VideoCapture(0)
     # determine_state(cap)
 
-    while True:
+    w = Window(Tk()).create()
+
+    while w.exists:
         event = event_queue.get()
         event.process()
         if isinstance(event, ProcessedImageEvent):
