@@ -28,6 +28,7 @@ class Frame:
 
 
 class DNNVideoProcessor(Thread):
+    GIF_LENGTH = 15
 
     def __init__(self, frame_queue, event_queue, model, debug):
         super(DNNVideoProcessor, self).__init__()
@@ -37,6 +38,7 @@ class DNNVideoProcessor(Thread):
         self.model = model
         self.previous_state = None
         self.image_id = 0
+        self.snapshot = []
         self.daemon = True
 
     def run(self):
@@ -45,6 +47,10 @@ class DNNVideoProcessor(Thread):
             img = frame_data.image
             timestamp = frame_data.timestamp
             state, debug_image = self.model.predict(img)
+
+            self.snapshot.append(debug_image)
+            if len(self.snapshot) > self.GIF_LENGTH:
+                self.snapshot.pop(0)
 
             if state != self.previous_state:
                 self.image_id += 1

@@ -11,13 +11,30 @@ from device_tracking.keyboard_tracker import KeyboardTracker
 from device_tracking.mouse_tracker import MouseTracker
 from device_tracking.video_tracker import VideoTracker, DNNVideoProcessor, ProcessedImageEvent
 from models.DNN_model import DNNModel
+from models.Keras_model import KerasModel
 from queue import SimpleQueue
+import imageio
+
 
 # from video_tracking.omegamodel import determine_state
 # from video_tracking.Keras_face_tracker import determine_state
 
-DEBUG = True
+def create_gif(imgs, count, state):
+    # time.sleep(0.43)
+    imageio.mimsave(f"tmp/{count}[{state}].gif", imgs[:], "GIF")
 
+
+def callback(w):
+    while w.exists:
+        event = event_queue.get()
+        event.process()
+        if isinstance(event, ProcessedImageEvent):
+            print("sas")
+            get_image(event.image_id).show()
+
+
+DEBUG = True
+USE_GUI = False
 
 if __name__ == "__main__":
     # Preparing databases
@@ -42,7 +59,7 @@ if __name__ == "__main__":
         frame_queue=frame_queue,
         event_queue=event_queue,
         debug=DEBUG,
-        model=DNNModel(DEBUG)
+        model=KerasModel(DEBUG)
     )
     video_tracker.track()
     video_processor.start()
@@ -55,10 +72,25 @@ if __name__ == "__main__":
     # cap = cv2.VideoCapture(0)
     # determine_state(cap)
 
-    w = Window(Tk()).create()
+    count = 0
 
-    while w.exists:
-        event = event_queue.get()
-        event.process()
-        if isinstance(event, ProcessedImageEvent):
-            get_image(event.image_id).show()
+    if USE_GUI:
+        w = Window(Tk())
+        threading.Thread(target=lambda: callback(w), daemon=True).start()
+        w.create()
+    else:
+        while True:
+            event = event_queue.get()
+            event.process()
+            if isinstance(event, ProcessedImageEvent):
+                count += 1
+
+                threading.Thread(
+                    target=lambda:
+                    create_gif(video_processor.snapshot, count, event.state),
+                    # imageio.mimsave(f"tmp/{count}[{event.state}].gif", video_processor.snapshot[:], "GIF"),
+                    daemon=True
+                ).start()
+
+                print(f" Length is {len(video_processor.snapshot[:])}")
+                # get_image(event.image_id).show()

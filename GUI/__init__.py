@@ -12,6 +12,7 @@ class Window:
         # self._place_textbox()
 
     def clean_up(self):
+        self.exists = False
         import keyboard, mouse
         keyboard.unhook_all()
         mouse.unhook_all()
