@@ -70,9 +70,9 @@ class DNNVideoProcessor(Thread):
 class VideoTracker(Tracker):
 
     def __init__(self, source, queue, debug):
-        self.debug = debug
-        self.queue = queue
         self.source = source
+        self.queue = queue
+        self.debug = debug
 
     def collect_frames(self, source):
         cap = cv2.VideoCapture(source)
