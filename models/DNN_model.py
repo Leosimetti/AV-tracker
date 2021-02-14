@@ -30,6 +30,6 @@ class DNNModel(Model):
                     box = faces3[0, 0, i, 3:7] * np.array([width, height, width, height])
                     (x, y, x1, y1) = box.astype("int")
                     cv2.rectangle(image, (x, y), (x1, y1), (0, 0, 255), 2)
-        states = ["Absent", "Present", "Group"]
+        states = ["No face", "Present", "Group"]
         state = states[number_of_faces if number_of_faces <= 2 else 2]
         return [state, image if self.debug else None]

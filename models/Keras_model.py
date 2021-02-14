@@ -35,13 +35,11 @@ class KerasModel(Model):
 
         # run the inference
         prediction = self.model.predict(data)
-        states = ["Present", "Not present", "Distracted"]
+        states = ["Present", "Absent", "Distracted"]
         state_index = tensorflow.math.argmax(prediction, axis=-1)[0]
-
         current_state = states[state_index]
-
-        cv2.putText(img, f'{current_state}', (10, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 4)
-        cv2.putText(img, f'{current_state}', (10, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+        # cv2.putText(img, f'{current_state}', (10, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 4)
+        # cv2.putText(img, f'{curent_state}', (10, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
         # print(f"[{states[state_index]}] {time.ctime()} {prediction}")
 

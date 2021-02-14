@@ -5,6 +5,9 @@ from datetime import datetime
 import numpy as np
 from db.video_data_db import insert_image, get_image
 import time
+from queue import SimpleQueue
+from collections import deque
+from copy import deepcopy
 
 
 class ProcessedImageEvent(TrackingEvent):
@@ -27,50 +30,93 @@ class Frame:
         self.timestamp = timestamp
 
 
-class DNNVideoProcessor(Thread):
-    GIF_LENGTH = 15
+class VideoProcessor(Thread):
+    GIF_LENGTH = 50
 
-    def __init__(self, frame_queue, event_queue, model, debug):
-        super(DNNVideoProcessor, self).__init__()
+    def __init__(self, frame_queue, event_queue, models, debug):
+        super(VideoProcessor, self).__init__()
         self.frame_queue = frame_queue
         self.event_queue = event_queue
         self.debug = debug
-        self.model = model
+        self.models = models
         self.previous_state = None
         self.image_id = 0
-        self.snapshot = []
+        self.snapshot = deque()
         self.daemon = True
+        self.snapshot_queue = SimpleQueue()
 
-    def run(self):
+    def determine_state(self, states):
+        if (states[0] == "Present" or states[0] == "Group") and states[1] == "Present":
+            return "Present"
+
+        elif (states[0] == "No face" and states[1] == "Present") or (states[0] == "Group" and states[1] == "Present"):
+            return "Present"
+
+        elif states[1] == "Distracted":
+            return "Distracted"
+
+        elif states[0] == "No face" and states[1] == "Absent" or states[0] == "Group" and states[1] == "Absent":
+            return "Absent"
+
+        elif (states[0] == "Present" and states[1] == "Absent") or (states[0] == "No face" and states[1] == "Present"):
+            # TODO: need other signal data
+            return "Inconsistent"
+
+
+    def run(self):  # TODO: refactor; It does not track both models...
+        # TODO: ubrat' eto gavno s debug_image[PICTURE_TO_CHOOSE]
+        PICTURE_TO_CHOOSE = 0
         while True:
             frame_data = self.frame_queue.get()
             img = frame_data.image
+
+            offset = 33
+            states = ["Error"] * len(self.models)
+            debug_image = [None] * len(self.models)
+            for i, model in enumerate(self.models):
+                states[i], debug_image[i] = model.predict(img)
+                cv2.putText(debug_image[PICTURE_TO_CHOOSE], f'{states[i]}', (1, 30 + offset * i),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 4)
+                cv2.putText(debug_image[PICTURE_TO_CHOOSE], f'{states[i]}', (1, 30 + offset * i),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+
             timestamp = frame_data.timestamp
-            state, debug_image = self.model.predict(img)
+            cv2.putText(debug_image[PICTURE_TO_CHOOSE], f'{timestamp.hour}:{timestamp.minute}:{timestamp.second}',
+                        (185, 233),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 4)
+            cv2.putText(debug_image[PICTURE_TO_CHOOSE], f'{timestamp.hour}:{timestamp.minute}:{timestamp.second}',
+                        (185, 233),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
-            self.snapshot.append(debug_image)
-            if len(self.snapshot) > self.GIF_LENGTH:
-                self.snapshot.pop(0)
+            self.snapshot.append(debug_image[PICTURE_TO_CHOOSE])
+            if len(self.snapshot) > self.GIF_LENGTH: #TODO remove for optimisation
+                self.snapshot.popleft()
 
-            if state != self.previous_state:
+            resulting_state = self.determine_state(states)
+
+            if resulting_state != self.previous_state:
+                self.snapshot_queue.put(deepcopy(self.snapshot))
+                self.snapshot.clear()
+
                 self.image_id += 1
                 if debug_image is not None:
-                    image_array = cv2.cvtColor(debug_image, cv2.COLOR_BGR2RGB)
+                    image_array = cv2.cvtColor(debug_image[PICTURE_TO_CHOOSE], cv2.COLOR_BGR2RGB)
                 else:
                     image_array = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
                 self.event_queue.put(
                     ProcessedImageEvent(
                         timestamp,
                         image_array,
-                        state,
+                        resulting_state,
                         image_array.shape,
                         self.image_id
                     )
                 )
                 if self.debug:
-                    print(f"[{state}] {timestamp}")
+                    print(f"[{resulting_state}] {timestamp}")
 
-            self.previous_state = state
+            self.previous_state = resulting_state
             # time.sleep(0.01)
 
 
@@ -82,18 +128,28 @@ class VideoTracker(Tracker):
         self.debug = debug
 
     def collect_frames(self, source):
+        frame_rate = 20
+        prev = 0
+
         cap = cv2.VideoCapture(source)
         no_error = True
         while no_error:
+
+            time_elapsed = time.time() - prev
+            # res, image = cap.read()
             no_error, frame = cap.read()
-            if no_error:
-                self.queue.put(
-                    Frame(
-                        image=frame,
-                        timestamp=datetime.now()
+
+            if time_elapsed > 1. / frame_rate:
+                prev = time.time()
+
+                if no_error:
+                    self.queue.put(
+                        Frame(
+                            image=frame,
+                            timestamp=datetime.now()
+                        )
                     )
-                )
-            time.sleep(0.2)
+            # time.sleep(0.2)
 
     def track(self):
         Thread(target=self.collect_frames,

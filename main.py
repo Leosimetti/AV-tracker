@@ -9,7 +9,7 @@ from db.video_data_db import *
 from db.timer import Timer
 from device_tracking.keyboard_tracker import KeyboardTracker
 from device_tracking.mouse_tracker import MouseTracker
-from device_tracking.video_tracker import VideoTracker, DNNVideoProcessor, ProcessedImageEvent
+from device_tracking.video_tracker import VideoTracker, VideoProcessor, ProcessedImageEvent
 from models.DNN_model import DNNModel
 from models.Keras_model import KerasModel
 from queue import SimpleQueue
@@ -18,11 +18,6 @@ import imageio
 
 # from video_tracking.omegamodel import determine_state
 # from video_tracking.Keras_face_tracker import determine_state
-
-def create_gif(imgs, count, state):
-    # time.sleep(0.43)
-    imageio.mimsave(f"tmp/{count}[{state}].gif", imgs[:], "GIF")
-
 
 def callback(w):
     while w.exists:
@@ -55,11 +50,11 @@ if __name__ == "__main__":
 
     # Video tracker
     video_tracker = VideoTracker(0, frame_queue, DEBUG)
-    video_processor = DNNVideoProcessor(
+    video_processor = VideoProcessor(
         frame_queue=frame_queue,
         event_queue=event_queue,
         debug=DEBUG,
-        model=KerasModel(DEBUG)
+        models=[DNNModel(DEBUG), KerasModel(DEBUG)]
     )
     video_tracker.track()
     video_processor.start()
@@ -86,11 +81,10 @@ if __name__ == "__main__":
                 count += 1
 
                 threading.Thread(
-                    target=lambda:
-                    create_gif(video_processor.snapshot, count, event.state),
-                    # imageio.mimsave(f"tmp/{count}[{event.state}].gif", video_processor.snapshot[:], "GIF"),
+                    target=lambda: imageio.mimsave(f"tmp/{count}[{event.state}].gif",
+                                                   video_processor.snapshot_queue.get(), "GIF"),
                     daemon=True
                 ).start()
 
-                print(f" Length is {len(video_processor.snapshot[:])}")
+                # print(f" Length is {len(video_tracker.sn[:])}")
                 # get_image(event.image_id).show()

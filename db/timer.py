@@ -11,8 +11,9 @@ class Timer:
     threshold = 5
     time_left = 5
     is_absent = True
+    is_over = False
 
-    def __init__(self, new_threshold: int):
+    def __init__(self, new_threshold):
         if new_threshold > 0:
             Timer.threshold = new_threshold
             Timer.time_left = new_threshold
@@ -34,4 +35,15 @@ class Timer:
                 Timer.time_left -= 1
             if not Timer.is_absent:
                 insert_processed_data("Absent")
+                Timer.is_absent = True
+
+
+    def startCountdown():
+        while True:
+            if Timer.time_left > 0:
+                Timer.is_over = False
+            while Timer.time_left > 0:
+                time.sleep(0.1)
+                Timer.time_left -= 0.1
+            if not Timer.is_absent:
                 Timer.is_absent = True
