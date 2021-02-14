@@ -44,6 +44,7 @@ class VideoProcessor(Thread):
         self.snapshot = deque()
         self.daemon = True
         self.snapshot_queue = SimpleQueue()
+        self.state_change_time = None
 
     def determine_state(self, states):
         if (states[0] == "Present" or states[0] == "Group") and states[1] == "Present":
@@ -61,7 +62,6 @@ class VideoProcessor(Thread):
         elif (states[0] == "Present" and states[1] == "Absent") or (states[0] == "No face" and states[1] == "Present"):
             # TODO: need other signal data
             return "Inconsistent"
-
 
     def run(self):  # TODO: refactor; It does not track both models...
         # TODO: ubrat' eto gavno s debug_image[PICTURE_TO_CHOOSE]
@@ -89,12 +89,14 @@ class VideoProcessor(Thread):
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
             self.snapshot.append(debug_image[PICTURE_TO_CHOOSE])
-            if len(self.snapshot) > self.GIF_LENGTH: #TODO remove for optimisation
-                self.snapshot.popleft()
+            # if len(self.snapshot) > self.GIF_LENGTH:  # TODO remove for optimisation
+            #     self.snapshot.popleft()
 
             resulting_state = self.determine_state(states)
 
-            if resulting_state != self.previous_state:
+            if resulting_state != self.previous_state and (
+                     self.state_change_time is None or (time.time() - self.state_change_time > 5)):
+                self.state_change_time = time.time()
                 self.snapshot_queue.put(deepcopy(self.snapshot))
                 self.snapshot.clear()
 
@@ -115,9 +117,8 @@ class VideoProcessor(Thread):
                 )
                 if self.debug:
                     print(f"[{resulting_state}] {timestamp}")
-
             self.previous_state = resulting_state
-            # time.sleep(0.01)
+        # time.sleep(0.01)
 
 
 class VideoTracker(Tracker):
