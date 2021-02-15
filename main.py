@@ -32,7 +32,7 @@ DEBUG = True
 USE_GUI = False
 
 if __name__ == "__main__":
-    if os.path.exists("db"):
+    if not os.path.exists("db"):
         os.mkdir("db")
 
     prepare_signalDB()
