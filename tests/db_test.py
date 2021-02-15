@@ -43,7 +43,7 @@ def test_insert_signal_data(db_connection):
     time_example = str(datetime.datetime.now())
     insert_data([time_example, "KEYBOARD", "TYPING"])
     data = cursor.execute("SELECT id, dateTime, deviceType, actionType from signals")
-    assert data.fetchone()[1:] == (time_example, "KEYBOARD", "TYPING")
+    assert data.fetchone()[2:] == ("KEYBOARD", "TYPING")
 
 
 def test_insert_image(db_connection):
@@ -52,7 +52,7 @@ def test_insert_image(db_connection):
     blank_image = np.zeros((2, 2))
     insert_image([time_example, blank_image, "ACTIVE", "10KB"])
     data = cursor.execute("SELECT id, dateTime, state, size, image from images")
-    assert data.fetchone()[1:4] == (time_example, "ACTIVE", "10KB")
+    assert data.fetchone()[2:4] == ("ACTIVE", "10KB")
 
 
 def test_insert_processed_data(db_connection):
