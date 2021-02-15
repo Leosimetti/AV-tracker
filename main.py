@@ -81,7 +81,7 @@ if __name__ == "__main__":
                 count += 1
 
                 threading.Thread(
-                    target=lambda: imageio.mimsave(f"tmp/{count}[{event.state}].gif",
+                    target=lambda: imageio.mimsave(f"tmp/{count} {event.state}.gif",
                                                    video_processor.snapshot_queue.get(), "GIF"),
                     daemon=True
                 ).start()

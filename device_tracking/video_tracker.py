@@ -31,7 +31,7 @@ class Frame:
 
 
 class VideoProcessor(Thread):
-    GIF_LENGTH = 50
+    GIF_LENGTH = 20
 
     def __init__(self, frame_queue, event_queue, models, debug):
         super(VideoProcessor, self).__init__()
@@ -66,6 +66,7 @@ class VideoProcessor(Thread):
     def run(self):  # TODO: refactor; It does not track both models...
         # TODO: ubrat' eto gavno s debug_image[PICTURE_TO_CHOOSE]
         PICTURE_TO_CHOOSE = 0
+        MIN_TIME_SPENT_IN_STATE = 5
         while True:
             frame_data = self.frame_queue.get()
             img = frame_data.image
@@ -89,13 +90,14 @@ class VideoProcessor(Thread):
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
             self.snapshot.append(debug_image[PICTURE_TO_CHOOSE])
-            # if len(self.snapshot) > self.GIF_LENGTH:  # TODO remove for optimisation
-            #     self.snapshot.popleft()
+
+            if len(self.snapshot) > self.GIF_LENGTH:  # TODO remove for optimisation
+                self.snapshot.popleft()
 
             resulting_state = self.determine_state(states)
 
             if resulting_state != self.previous_state and (
-                     self.state_change_time is None or (time.time() - self.state_change_time > 5)):
+                     self.state_change_time is None or (time.time() - self.state_change_time > MIN_TIME_SPENT_IN_STATE)):
                 self.state_change_time = time.time()
                 self.snapshot_queue.put(deepcopy(self.snapshot))
                 self.snapshot.clear()
@@ -110,7 +112,7 @@ class VideoProcessor(Thread):
                     ProcessedImageEvent(
                         timestamp,
                         image_array,
-                        resulting_state,
+                        f"[{self.previous_state}] v [{resulting_state}]",
                         image_array.shape,
                         self.image_id
                     )
