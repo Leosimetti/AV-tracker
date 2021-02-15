@@ -11,7 +11,7 @@ from device_tracking.keyboard_tracker import KeyboardTracker
 from device_tracking.mouse_tracker import MouseTracker
 from device_tracking.video_tracker import VideoTracker, VideoProcessor, ProcessedImageEvent
 from models.DNN_model import DNNModel
-from models.Keras_model import KerasModel
+from models.Keras_pb_model import KerasPBModel
 from queue import SimpleQueue
 import imageio
 import os
@@ -54,7 +54,7 @@ if __name__ == "__main__":
         frame_queue=frame_queue,
         event_queue=event_queue,
         debug=DEBUG,
-        models=[DNNModel(DEBUG), KerasModel(DEBUG)]
+        models=[DNNModel(DEBUG), KerasPBModel(DEBUG)]
     )
     video_tracker.track()
     video_processor.start()

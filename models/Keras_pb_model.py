@@ -6,36 +6,53 @@ from PIL import Image, ImageOps
 
 # https://github.com/opencv/opencv/issues/16582
 
-class DNNModel(Model):
-    MODEL_FILE = "models/keras_pb_model.pb"
+MODEL_FILE = "models/frozen_graph.pb"
+class KerasPBModel(Model):
 
     def __init__(self, debug):
         self.debug = debug
-        self.model = cv2.dnn.readNetFromTensorflow(self.MODEL_FILE)
+        self.model = cv2.dnn.readNet(MODEL_FILE)
 
-    def predict(self, image):
+    def predict(self, img):
+        tensorflowNet = self.model
 
-        image = cv2.resize(image, None, fx=0.5, fy=0.5)
-        height, width = image.shape[:2]
-        blob = cv2.dnn.blobFromImage(image, size=(224, 224), swapRB=True, crop=False)
-        self.model.setInput(blob)
-        faces3 = self.model.forward()
+        no_error = True
+        while no_error:
+            color_coverted = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            image = Image.fromarray(color_coverted)
 
-        number_of_faces = 0
-        for i in range(faces3.shape[2]):
-            confidence = faces3[0, 0, i, 2]
-            if confidence > 0.5:
-                number_of_faces += 1
-                if self.debug:
-                    box = faces3[0, 0, i, 3:7] * np.array([width, height, width, height])
-                    (x, y, x1, y1) = box.astype("int")
-                    cv2.rectangle(image, (x, y), (x1, y1), (0, 0, 255), 2)
-        states = ["No face", "Present", "Group"]
-        state = states[number_of_faces if number_of_faces <= 2 else 2]
-        return [state, image if self.debug else None]
+            # resize the image to a 224x224 with the same strategy as in TM2:
+            # resizing the image to be at least 224x224 and then cropping from the center
+            size = (224, 224)
+            image = ImageOps.fit(image, size, Image.ANTIALIAS)
+
+            image_array = np.asarray(image)
+            normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+
+            blob = cv2.dnn.blobFromImage(cv2.resize(normalized_image_array, (224, 224)))
+            tensorflowNet.setInput(blob)
+
+            # Runs a forward pass to compute the net output
+            out = tensorflowNet.forward()
+
+            # print(f"[Flat] {out}")
+            # out = out.flatten()
+            # print(f"{out}")
+            classId = np.argmax(out)
+            # confidence = out[classId]
+
+            states = ["Present", "Absent", "Distracted"]
 
 
-MODEL_FILE = "keras_model.pb"
+            # state_index = tensorflow.math.argmax(prediction, axis=-1)[0]
+            current_state = states[classId]
+
+            return [current_state, img if self.debug else None]
+
+            # print(f"[{states[classId]}], {confidence}")
+
+
+# MODEL_FILE = "keras_model.pb"
 
 if __name__ == "__main__":
     import tensorflow as tf
@@ -70,8 +87,6 @@ if __name__ == "__main__":
         no_error, img = cap.read()
         # rows, cols, channels = img.shape
 
-        # blob = cv2.dnn.blobFromImage(cv2.resize(img, (224, 224)))
-
         data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
         color_coverted = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         image = Image.fromarray(color_coverted)
@@ -81,6 +96,10 @@ if __name__ == "__main__":
         size = (224, 224)
         image = ImageOps.fit(image, size, Image.ANTIALIAS)
 
+        image_array = np.asarray(image)
+        normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+
+        blob = cv2.dnn.blobFromImage(cv2.resize(normalized_image_array, (224, 224)))
         #
         # # turn the image into a numpy array
         # image_array = np.asarray(image)
@@ -100,7 +119,7 @@ if __name__ == "__main__":
         #                                 swapRB=False,
         #                                 crop=False)
 
-        tensorflowNet.setInput(image)
+        tensorflowNet.setInput(blob)
 
         # Runs a forward pass to compute the net output
         out = tensorflowNet.forward()
