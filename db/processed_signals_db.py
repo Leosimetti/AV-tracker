@@ -18,7 +18,7 @@ def prepare_processed_signalDB():
 def insert_processed_data(state: str):
     conn = sqlite3.connect('db/signals.sqlite')
     cursor = conn.cursor()
-    dateTime = datetime.datetime.today()
+    dateTime = datetime.datetime.now()
 
     cursor.execute(f"""
     INSERT INTO processed_signals
