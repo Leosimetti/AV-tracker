@@ -4,7 +4,7 @@ from db.timer import Timer
 
 
 def prepare_signalDB():
-    conn = sqlite3.connect('db/signals.test_signal')
+    conn = sqlite3.connect('db/signals.sqlite')
     cursor = conn.cursor()
 
     cursor.execute("DROP TABLE IF EXISTS signals;")
