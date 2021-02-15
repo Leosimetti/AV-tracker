@@ -14,7 +14,7 @@ from models.DNN_model import DNNModel
 from models.Keras_model import KerasModel
 from queue import SimpleQueue
 import imageio
-
+import os
 
 # from video_tracking.omegamodel import determine_state
 # from video_tracking.Keras_face_tracker import determine_state
@@ -32,16 +32,16 @@ DEBUG = True
 USE_GUI = False
 
 if __name__ == "__main__":
-    # Preparing databases
+    if os.path.exists("db"):
+        os.mkdir("db")
+
     prepare_signalDB()
     prepare_imageDB()
     prepare_processed_signalDB()
 
-    # Creating queues
     event_queue = SimpleQueue()
     frame_queue = SimpleQueue()
 
-    # Assigning trackers for K&M
     kb_tracker = KeyboardTracker(event_queue, DEBUG)
     kb_tracker.track()
 
@@ -68,6 +68,14 @@ if __name__ == "__main__":
     # determine_state(cap)
 
     count = 0
+
+    if not os.path.exists("tmp"):
+        os.mkdir("tmp")
+    else:
+        for file in os.listdir("tmp"):
+            os.remove(f"tmp/{file}")
+        os.rmdir("tmp")
+        os.mkdir("tmp")
 
     if USE_GUI:
         w = Window(Tk())
