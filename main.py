@@ -2,7 +2,7 @@ import cv2
 import time
 import threading
 
-from GUI import *
+from GUI.WebUI import WebWindow
 from db.processed_signals_db import *
 from db.signals_db import *
 from db.video_data_db import *
@@ -19,17 +19,8 @@ import os
 # from video_tracking.omegamodel import determine_state
 # from video_tracking.Keras_face_tracker import determine_state
 
-def callback(w):
-    while w.exists:
-        event = event_queue.get()
-        event.process()
-        if isinstance(event, ProcessedImageEvent):
-            print("sas")
-            get_image(event.image_id).show()
-
-
 DEBUG = True
-USE_GUI = False
+USE_GUI = True
 
 if __name__ == "__main__":
     if not os.path.exists("db"):
@@ -77,10 +68,27 @@ if __name__ == "__main__":
         os.rmdir("tmp")
         os.mkdir("tmp")
 
+
     if USE_GUI:
-        w = Window(Tk())
-        threading.Thread(target=lambda: callback(w), daemon=True).start()
-        w.create()
+        w = WebWindow()
+        threading.Thread(
+            target= w.create_window,
+            daemon=True
+        ).start()
+
+
+        while w.open:
+            event = event_queue.get()
+            event.process()
+            if isinstance(event, ProcessedImageEvent):
+                count += 1
+
+                threading.Thread(
+                    target=lambda: imageio.mimsave(f"tmp/{count} {event.state}.gif",
+                                                   video_processor.snapshot_queue.get(), "GIF"),
+                    daemon=True
+                ).start()
+        exit()
     else:
         while True:
             event = event_queue.get()
