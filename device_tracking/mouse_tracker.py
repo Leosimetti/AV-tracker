@@ -44,12 +44,11 @@ class MouseTrackingEvent(TrackingEvent):
 
 class MouseTracker(Tracker):
 
-    def __init__(self, queue, debug):
+    def __init__(self, debug):
         if debug:
             self.event_dict = {}
         self.move_count = 0
         self.scroll_count = 0
-        self.queue = queue
         self.debug = debug
         self.previous_event = None
 
@@ -80,22 +79,22 @@ class MouseTracker(Tracker):
             if self.previous_event.is_move():
                 self.move_msg(self.previous_event)
                 self.move_count = 0
-                self.queue.put(self.previous_event)
+                self.previous_event.process()
                 if event.is_wheel():
                     self.scroll_count = 1
                 else:
                     self.click_msg(event)
-                    self.queue.put(event)
+                    event.process()
 
             elif self.previous_event.is_wheel():
                 self.wheel_msg(self.previous_event)
                 self.scroll_count = 0
-                self.queue.put(self.previous_event)
+                self.previous_event.process()
                 if event.is_move():
                     self.move_count = 1
                 else:
                     self.click_msg(event)
-                    self.queue.put(event)
+                    event.process()
             elif self.previous_event.is_click():
                 if event.is_move():
                     self.move_count += 1

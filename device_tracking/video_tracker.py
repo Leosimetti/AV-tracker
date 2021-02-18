@@ -20,6 +20,9 @@ class ProcessedImageEvent(TrackingEvent):
         self.data = (self.timestamp, self.processed_image, self.state, self.size)
         self.image_id = image_id
 
+    def __str__(self):
+        return " ".join(map(lambda x: str(x), self.data))
+
     def process(self):
         insert_image(self.data)
 
@@ -112,7 +115,7 @@ class VideoProcessor(Thread):
                     ProcessedImageEvent(
                         timestamp,
                         image_array,
-                        f"[{self.previous_state}] v [{resulting_state}]",
+                        f"[{self.previous_state}] to [{resulting_state}]",
                         image_array.shape,
                         self.image_id
                     )

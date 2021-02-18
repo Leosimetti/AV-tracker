@@ -19,9 +19,7 @@ class KeyboardTrackingEvent(TrackingEvent):
 
 
 class KeyboardTracker(Tracker):
-
-    def __init__(self, queue, debug):
-        self.queue = queue
+    def __init__(self, debug):
         self.debug = debug
 
     def track(self):
@@ -35,5 +33,6 @@ class KeyboardTracker(Tracker):
             category = KeyboardTrackingEvent.NON_TYPING
 
         timestamp = datetime.utcfromtimestamp(event.time)
-        self.queue.put(KeyboardTrackingEvent(category, timestamp))
+        tracking_event = KeyboardTrackingEvent(category, timestamp)
+        tracking_event.process()
         self.debug_info(f"{timestamp} {category}")
