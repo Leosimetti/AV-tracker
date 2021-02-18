@@ -6,9 +6,10 @@ import numpy as np
 import os
 from PIL import Image
 
-PATH = os.path.dirname(__file__)
-DB_PATH = os.path.join(PATH, 'signals.sqlite')
+# PATH = os.path.dirname(__file__)
+DB_PATH = 'db/signals.sqlite'#os.path.join(PATH, 'signals.sqlite')
 
+# print(DB_PATH)
 
 def prepare_imageDB():
     conn = sqlite3.connect(DB_PATH)
