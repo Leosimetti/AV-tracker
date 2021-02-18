@@ -6,6 +6,7 @@ dist
 # please dont commit
 tmp
 data.zip
+main.build
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

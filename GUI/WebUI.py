@@ -10,6 +10,7 @@ import time
 class WebWindow:
     def __init__(self):
         self.open = True
+        self.msg = "sas"
 
     def create_window(self):
 
@@ -33,6 +34,12 @@ class WebWindow:
                     self.open = False
 
             return Response(stream_with_context(gen()))
+
+        @app.route("/exit", methods=['POST'])
+        def move_forward():
+            # Moving forward code
+            # forward_message = "Exitting..."
+            exit()
 
         # call the 'run' method
         ui.run()

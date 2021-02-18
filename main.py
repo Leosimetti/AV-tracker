@@ -19,6 +19,8 @@ import os
 # from video_tracking.omegamodel import determine_state
 # from video_tracking.Keras_face_tracker import determine_state
 
+# pyinstaller main.py --noconsole --onefile --add-data "GUI;GUI" --exclude-module tensorflow
+
 DEBUG = True
 USE_GUI = True
 
