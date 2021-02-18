@@ -12,6 +12,9 @@ from device_tracking.pythonic_video_tracker import PythonicVideoTracker
 from models.DNN_model import DNNModel
 from models.Keras_pb_model import KerasPBModel
 
+# for Linux (maybe even MacOS):
+# sudo pyinstaller main.py --noconsole --onefile --add-data GUI:GUI --exclude-module tensorflow
+# for windows:
 # pyinstaller main.py --noconsole --onefile --add-data "GUI;GUI" --exclude-module tensorflow
 
 DEBUG = True
