@@ -3,11 +3,15 @@ import cv2
 import sqlite3
 import datetime
 import numpy as np
+import os
 from PIL import Image
+
+PATH = os.path.dirname(__file__)
+DB_PATH = os.path.join(PATH, 'signals.sqlite')
 
 
 def prepare_imageDB():
-    conn = sqlite3.connect('db/signals.sqlite')
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("DROP TABLE IF EXISTS images;")
@@ -20,7 +24,7 @@ def prepare_imageDB():
 
 
 def insert_image(data):
-    conn = sqlite3.connect("db/signals.sqlite")
+    conn = sqlite3.connect(DB_PATH)
 
     cursor = conn.cursor()
 
@@ -35,7 +39,7 @@ def insert_image(data):
 
 
 def get_image(ID):
-    conn = sqlite3.connect("db/signals.sqlite")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.execute("SELECT image, size from images WHERE id = ?", [ID])
 
     row = cursor.fetchone()
