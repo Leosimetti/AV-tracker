@@ -1,47 +1,48 @@
-from pcv.vidIO import LockedCamera, VideoWriter
-from datetime import datetime
-import cv2
-from models.DNN_model import DNNModel
-from models.Keras_model import KerasModel
-from models.Keras_pb_model import KerasPBModel
+import os
 from collections import deque
 from copy import deepcopy
+from datetime import datetime
 from queue import SimpleQueue
+from threading import Thread
+
+import cv2
+import imageio
+from pcv.vidIO import LockedCamera
+
 from db.video_data_db import insert_image
-
-
-# class DatabaseWriter(VideoWriter):
-#
-#     def __init__(self, db="images.sqlite"):
-#         super(VideoWriter, self).__init__()
-#         self.conn = sqlite3.connect(db)
-#         self.cursor = self.conn.cursor()
-#
-#     def write(self, img):
-#         data = (datetime.now(), img, state, img.shape)
-#         self.cursor.execute("""
-#         INSERT INTO images
-#         (dateTime, image, state, size)
-#         VALUES (?, ?, ?, ?);
-#         """, data)
-#
-#     def __exit__(self, exc_type, exc_val, exc_tb):
-#         self.conn.close()
+from device_tracking import Tracker
 
 
 class VideoProcessor:
-    GIF_LENGTH = 20
+    GIF_LENGTH = 10
 
     def __init__(self, models, debug):
         super(VideoProcessor, self).__init__()
         self.debug = debug
+        if self.debug:
+            if not os.path.exists("tmp"):
+                os.mkdir("tmp")
+            else:
+                for file in os.listdir("tmp"):
+                    os.remove(f"tmp/{file}")
+                os.rmdir("tmp")
+                os.mkdir("tmp")
+            os.chmod("tmp", 0o777)
+
+        self.state_change_count = 1
         self.models = models
         self.previous_state = None
         self.image_id = 0
         self.snapshot = deque()
-        self.daemon = True
         self.snapshot_queue = SimpleQueue()
         self.state_change_time = None
+
+    def record_gif(self, state):
+        Thread(target=
+               lambda: imageio.mimsave(f"tmp/{self.state_change_count} {state}.gif", deepcopy(self.snapshot), "GIF"),
+               daemon=True
+               ).start()
+        self.state_change_count += 1
 
     @staticmethod
     def determine_state(states):
@@ -86,7 +87,7 @@ class VideoProcessor:
                     (185, 233),
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
-        self.snapshot.append(debug_image[PICTURE_TO_CHOOSE])
+        self.snapshot.append(cv2.cvtColor(debug_image[PICTURE_TO_CHOOSE], cv2.COLOR_BGR2RGB))
 
         if len(self.snapshot) > self.GIF_LENGTH:  # TODO remove for optimisation
             self.snapshot.popleft()
@@ -95,10 +96,9 @@ class VideoProcessor:
 
         state_changed = resulting_state != self.previous_state
 
-        if state_changed:
+        if state_changed and self.previous_state is not None:
+
             self.state_change_time = datetime.now()
-            self.snapshot_queue.put(deepcopy(self.snapshot))
-            self.snapshot.clear()
 
             self.image_id += 1
             if debug_image is not None:
@@ -110,11 +110,12 @@ class VideoProcessor:
                     timestamp,
                     memoryview(image_array),
                     resulting_state,
-                    str(image_array.shape)
+                    " ".join(map(lambda x: str(x), image_array.shape))
                 )
             )
 
             if self.debug:
+                self.record_gif(state=f"from {self.previous_state} to {resulting_state}")
                 print(f"[{resulting_state}] {timestamp}")
         self.previous_state = resulting_state
 
@@ -125,11 +126,16 @@ class VideoProcessor:
     # time.sleep(0.01)
 
 
+class PythonicVideoTracker(Tracker):
+
+    def __init__(self, source, debug, models):
+        self.source = source
+        self.models = models
+        self.debug = debug
+        self.processor = VideoProcessor(models=self.models, debug=self.debug)
+
+    def track(self):
+        with LockedCamera(self.source, process=self.processor, display="Live Feed") as cam:
+            cam.record_stream(filename="stuff.mp4", show=self.debug)
+
 # writer = DatabaseWriter()
-processor = VideoProcessor(models=[DNNModel(True), KerasModel(True), KerasPBModel(True)],
-                           debug=True)
-
-
-if __name__ == "__main__":
-    with LockedCamera(0, process=processor) as cam:
-        cam.stream()
