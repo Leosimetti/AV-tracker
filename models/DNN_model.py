@@ -1,12 +1,13 @@
 from models import Model
 import cv2
 import numpy as np
+import os
 from PIL import Image
 
 
 class DNNModel(Model):
-    MODEL_FILE = "models/res10_300x300_ssd_iter_140000.caffemodel"
-    CONFIG_FILE = "models/deploy.prototxt.txt"
+    MODEL_FILE = os.path.join(Model.MODEL_PATH, "res10_300x300_ssd_iter_140000.caffemodel")
+    CONFIG_FILE = os.path.join(Model.MODEL_PATH, "deploy.prototxt.txt")
 
     def __init__(self, debug):
         self.debug = debug

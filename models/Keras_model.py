@@ -2,15 +2,17 @@ from models import Model
 import tensorflow
 import cv2
 import numpy as np
+import os
 from PIL import Image, ImageOps
 
 
 class KerasModel(Model):
-    MODEL_FILE = "models/keras_model.h5"
+
+    MODEL_FILE = os.path.join(Model.MODEL_PATH, "keras_model.h5")
 
     def __init__(self, debug):
         self.debug = debug
-        self.model = tensorflow.keras.models.load_model('models/keras_model.h5')
+        self.model = tensorflow.keras.models.load_model(self.MODEL_FILE)
         np.set_printoptions(suppress=True)
 
     def predict(self, img):

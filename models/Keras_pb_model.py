@@ -1,17 +1,19 @@
 from models import Model
 import cv2
 import numpy as np
+import os
 from PIL import Image, ImageOps
 
 
 # https://github.com/opencv/opencv/issues/16582
 
-MODEL_FILE = "models/frozen_graph.pb"
 class KerasPBModel(Model):
+
+    MODEL_FILE = os.path.join(Model.MODEL_PATH, "frozen_graph.pb")
 
     def __init__(self, debug):
         self.debug = debug
-        self.model = cv2.dnn.readNet(MODEL_FILE)
+        self.model = cv2.dnn.readNet(self.MODEL_FILE)
 
     def predict(self, img):
         tensorflowNet = self.model
