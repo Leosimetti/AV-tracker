@@ -9,7 +9,7 @@ from PIL import Image, ImageOps
 
 class KerasPBModel(Model):
 
-    MODEL_FILE = os.path.join(Model.MODEL_PATH, "frozen_graph.pb")
+    MODEL_FILE = os.path.join("models", "frozen_graph.pb")
 
     def __init__(self, debug):
         self.debug = debug

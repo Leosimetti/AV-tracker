@@ -11,6 +11,7 @@ from device_tracking.keyboard_tracker import KeyboardTracker
 from device_tracking.pythonic_video_tracker import PythonicVideoTracker
 from models.DNN_model import DNNModel
 from models.Keras_pb_model import KerasPBModel
+from GUI.WebUI import WebWindow
 
 # for Linux (maybe even MacOS):
 # sudo pyinstaller main.py --noconsole --onefile --add-data GUI:GUI --exclude-module tensorflow
@@ -34,6 +35,12 @@ if __name__ == "__main__":
     mouse_tracker = MouseTracker(DEBUG)
     mouse_tracker.track()
 
+    w = WebWindow()
+    threading.Thread(
+        target=w.create_window,
+        daemon=True
+    ).start()
+
     # Video tracker
     video_tracker = PythonicVideoTracker(source=0,
                                          debug=DEBUG,
@@ -46,3 +53,7 @@ if __name__ == "__main__":
     timer.start()
 
 
+    while w.open:
+        pass
+
+    exit()

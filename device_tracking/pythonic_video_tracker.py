@@ -69,8 +69,10 @@ class VideoProcessor:
     def __call__(self, img):  # TODO: refactor; It does not track both models...
         # TODO: ubrat' eto gavno s debug_image[PICTURE_TO_CHOOSE]
         PICTURE_TO_CHOOSE = 0
-        MIN_TIME_SPENT_IN_STATE = 5
+        MIN_TIME_SPENT_IN_STATE = 2
         offset = 33
+
+
         states = ["Error"] * len(self.models)
         debug_image = [None] * len(self.models)
         for i, model in enumerate(self.models):
@@ -98,8 +100,9 @@ class VideoProcessor:
         state_changed = resulting_state != self.previous_state
 
         if state_changed and self.previous_state is not None:
+                # and (self.state_change_time is None or (time.time() - self.state_change_time > MIN_TIME_SPENT_IN_STATE)):
 
-            self.state_change_time = datetime.now()
+            self.state_change_time = time.time()
 
             self.image_id += 1
             if debug_image is not None:
