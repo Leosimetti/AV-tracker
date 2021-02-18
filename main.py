@@ -1,5 +1,5 @@
-import cv2
-import time
+#!/usr/bin/sudo python3
+
 import threading
 
 from GUI.WebUI import WebWindow
@@ -20,7 +20,7 @@ import os
 # from video_tracking.Keras_face_tracker import determine_state
 
 DEBUG = True
-USE_GUI = True
+USE_GUI = not True
 
 if __name__ == "__main__":
     if not os.path.exists("db"):
