@@ -8,6 +8,11 @@ from PIL import Image
 
 # PATH = os.path.dirname(__file__)
 DB_PATH = 'db/signals.sqlite'#os.path.join(PATH, 'signals.sqlite')
+# TODO: fix problem on linux:
+#   File "main.py", line 25, in <module>
+#   File "db/video_data_db.py", line 14, in prepare_imageDB
+#   sqlite3.OperationalError: unable to open database file
+
 
 # print(DB_PATH)
 
