@@ -44,12 +44,11 @@ class MouseTrackingEvent(TrackingEvent):
 
 class MouseTracker(Tracker):
 
-    def __init__(self, queue, debug):
+    def __init__(self, debug):
         if debug:
             self.event_dict = {}
         self.move_count = 0
         self.scroll_count = 0
-        self.queue = queue
         self.debug = debug
         self.previous_event = None
 

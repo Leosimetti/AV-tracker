@@ -19,9 +19,7 @@ class KeyboardTrackingEvent(TrackingEvent):
 
 
 class KeyboardTracker(Tracker):
-
-    def __init__(self, queue, debug):
-        self.queue = queue
+    def __init__(self, debug):
         self.debug = debug
 
     def track(self):
