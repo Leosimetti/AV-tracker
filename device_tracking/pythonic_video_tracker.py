@@ -1,4 +1,5 @@
 import os
+import time
 from collections import deque
 from copy import deepcopy
 from datetime import datetime
@@ -119,11 +120,11 @@ class VideoProcessor:
                 print(f"[{resulting_state}] {timestamp}")
         self.previous_state = resulting_state
 
+        time.sleep(0.1377)
         if self.debug:
             return debug_image[PICTURE_TO_CHOOSE]
         else:
             return img
-    # time.sleep(0.01)
 
 
 class PythonicVideoTracker(Tracker):
@@ -136,6 +137,6 @@ class PythonicVideoTracker(Tracker):
 
     def track(self):
         with LockedCamera(self.source, process=self.processor, display="Live Feed") as cam:
-            cam.record_stream(filename="stuff.mp4", show=self.debug)
+            cam.stream()
 
 # writer = DatabaseWriter()
