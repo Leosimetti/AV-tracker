@@ -39,3 +39,5 @@ wrapt==1.12.1
 pytest==6.2.2
 
 imageio~=2.9.0
+Flask~=1.1.2
+flaskwebgui~=0.1.13
