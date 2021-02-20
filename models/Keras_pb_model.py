@@ -49,7 +49,7 @@ class KerasPBModel(Model):
             # state_index = tensorflow.math.argmax(prediction, axis=-1)[0]
             current_state = states[classId]
 
-            return [current_state, img if self.debug else None]
+            return [current_state, img]
 
             # print(f"[{states[classId]}], {confidence}")
 

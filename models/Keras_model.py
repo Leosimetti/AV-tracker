@@ -34,4 +34,4 @@ class KerasModel(Model):
         state_index = tensorflow.math.argmax(prediction, axis=-1)[0]
         current_state = states[state_index]
 
-        return [current_state, img if self.debug else None]
+        return [current_state, img]

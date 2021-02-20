@@ -33,4 +33,4 @@ class DNNModel(Model):
                     cv2.rectangle(image, (x, y), (x1, y1), (0, 0, 255), 2)
         states = ["No face", "Present", "Group"]
         state = states[number_of_faces if number_of_faces <= 2 else 2]
-        return [state, image if self.debug else None]
+        return [state, image]
