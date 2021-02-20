@@ -50,6 +50,13 @@ class VideoProcessor:
             imageio.mimsave(f"tmp/{count} {state}.gif", snapshot, "GIF")
 
     @staticmethod
+    def put_outlined_text(img, text, where):
+        cv2.putText(img, text, where,
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 4)
+        cv2.putText(img, text, where,
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+
+    @staticmethod
     def determine_state(states):
         if len(states) == 1:
             return states[0]
@@ -83,18 +90,18 @@ class VideoProcessor:
         debug_image = [None] * len(self.models)
         for i, model in enumerate(self.models):
             states[i], debug_image[i] = model.predict(img)
-            cv2.putText(debug_image[PICTURE_TO_CHOOSE], f'{states[i]}', (1, 30 + offset * i),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 4)
-            cv2.putText(debug_image[PICTURE_TO_CHOOSE], f'{states[i]}', (1, 30 + offset * i),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+            VideoProcessor.put_outlined_text(
+                img=debug_image[PICTURE_TO_CHOOSE],
+                text=f'{states[i]}',
+                where=(1, 30 + offset * i)
+            )
 
         timestamp = datetime.now()
-        cv2.putText(debug_image[PICTURE_TO_CHOOSE], f'{timestamp.hour}:{timestamp.minute}:{timestamp.second}',
-                    (185, 233),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 4)
-        cv2.putText(debug_image[PICTURE_TO_CHOOSE], f'{timestamp.hour}:{timestamp.minute}:{timestamp.second}',
-                    (185, 233),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+        VideoProcessor.put_outlined_text(
+            img=debug_image[PICTURE_TO_CHOOSE],
+            text=f'{timestamp.hour}:{timestamp.minute}:{timestamp.second}',
+            where=(185, 233)
+        )
 
         self.snapshot.append(cv2.cvtColor(debug_image[PICTURE_TO_CHOOSE], cv2.COLOR_BGR2RGB))
 
