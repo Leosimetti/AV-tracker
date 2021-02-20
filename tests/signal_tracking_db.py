@@ -5,7 +5,7 @@ import keyboard
 from queue import SimpleQueue
 from device_tracking.keyboard_tracker import *
 from device_tracking.mouse_tracker import *
-from db.signals_db import prepare_signalDB
+from db.signals_db import prepare_signal_db
 import pynput
 import time
 

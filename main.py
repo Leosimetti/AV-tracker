@@ -26,7 +26,7 @@ if __name__ == "__main__":
     if not os.path.exists("db"):
         os.mkdir("db")
 
-    prepare_signalDB()
+    prepare_signal_db()
     prepare_imageDB()
     prepare_processed_signalDB()
 
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     video_tracker.track()
 
     # Start timer that help determine user presence based on K&M input singals
-    timer = threading.Thread(target=Timer.startTimer, daemon=True)
+    timer = threading.Thread(target=Timer.start_timer, daemon=True)
     timer.start()
 
 

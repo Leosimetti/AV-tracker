@@ -20,30 +20,30 @@ class Timer:
         else:
             raise ValueError("Threshold of timer should be positive number")
 
-    @staticmethod
-    def resetTimer():
-        Timer.time_left = Timer.threshold
+    @classmethod
+    def reset_timer(cls):
+        cls.time_left = cls.threshold
 
-    @staticmethod
-    def startTimer():
+    @classmethod
+    def start_timer(cls):
         while True:
-            if Timer.time_left > 0:
+            if cls.time_left > 0:
                 insert_processed_data("Present")
-                Timer.is_absent = False
-            while Timer.time_left > 0:
+                cls.is_absent = False
+            while cls.time_left > 0:
                 time.sleep(1)
-                Timer.time_left -= 1
-            if not Timer.is_absent:
+                cls.time_left -= 1
+            if not cls.is_absent:
                 insert_processed_data("Absent")
-                Timer.is_absent = True
+                cls.is_absent = True
 
-
-    def startCountdown():
+    @classmethod
+    def start_countdown(cls):
         while True:
-            if Timer.time_left > 0:
-                Timer.is_over = False
-            while Timer.time_left > 0:
+            if cls.time_left > 0:
+                cls.is_over = False
+            while cls.time_left > 0:
                 time.sleep(0.1)
-                Timer.time_left -= 0.1
-            if not Timer.is_absent:
-                Timer.is_absent = True
+                cls.time_left -= 0.1
+            if not cls.is_absent:
+                cls.is_absent = True

@@ -19,7 +19,7 @@ def db_connection():
 
 def test_preparation_signals_db(db_connection):
     conn, cursor = db_connection
-    prepare_signalDB()
+    prepare_signal_db()
     presence = cursor.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='signals'")
     assert presence.fetchone()[0] == 1
 

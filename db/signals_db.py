@@ -3,7 +3,7 @@ import queue
 from db.timer import Timer
 
 
-def prepare_signalDB():
+def prepare_signal_db():
     conn = sqlite3.connect('db/signals.sqlite')
     cursor = conn.cursor()
 
@@ -20,7 +20,7 @@ def insert_data(data):
     conn = sqlite3.connect('db/signals.sqlite')
     cursor = conn.cursor()
 
-    Timer.resetTimer()
+    Timer.reset_timer()
 
     cursor.execute(f"""
     INSERT INTO signals
