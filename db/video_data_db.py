@@ -1,9 +1,6 @@
-import time
-import cv2
 import sqlite3
-import datetime
+
 import numpy as np
-import os
 from PIL import Image
 
 # PATH = os.path.dirname(__file__)
