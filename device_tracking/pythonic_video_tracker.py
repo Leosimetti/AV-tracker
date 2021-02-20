@@ -105,7 +105,7 @@ class VideoProcessor:
 
         self.snapshot.append(cv2.cvtColor(debug_image[PICTURE_TO_CHOOSE], cv2.COLOR_BGR2RGB))
 
-        if len(self.snapshot) > self.GIF_LENGTH:  # TODO remove for optimisation
+        if len(self.snapshot) > self.GIF_LENGTH:
             self.snapshot.popleft()
 
         resulting_state = self.determine_state(states)
@@ -118,7 +118,7 @@ class VideoProcessor:
             self.state_change_time = time.time()
 
             self.image_id += 1
-            if debug_image is not None:
+            if self.debug:
                 image_array = cv2.cvtColor(debug_image[PICTURE_TO_CHOOSE], cv2.COLOR_BGR2RGB)
             else:
                 image_array = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
