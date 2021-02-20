@@ -1,14 +1,14 @@
 import os
 import time
 from collections import deque
-from copy import deepcopy
+import copy
 from datetime import datetime
 from queue import SimpleQueue
 from threading import Thread
 
 import cv2
 import imageio
-from pcv.vidIO import LockedCamera
+from pcv.vidIO import LockedCamera, SlowCamera
 
 from db.video_data_db import insert_image
 from device_tracking import Tracker
@@ -20,6 +20,7 @@ class VideoProcessor:
     def __init__(self, models, debug):
         super(VideoProcessor, self).__init__()
         self.debug = debug
+
         if self.debug:
             if not os.path.exists("tmp"):
                 os.mkdir("tmp")
@@ -30,20 +31,22 @@ class VideoProcessor:
                 os.mkdir("tmp")
             os.chmod("tmp", 0o777)
 
-        self.state_change_count = 1
+        self.state_change_count = 0
         self.models = models
         self.previous_state = None
         self.image_id = 0
         self.snapshot = deque()
-        self.snapshot_queue = SimpleQueue()
+        self.gif_queue = SimpleQueue()
         self.state_change_time = None
 
-    def record_gif(self, state):
-        Thread(target=
-               lambda: imageio.mimsave(f"tmp/{self.state_change_count} {state}.gif", deepcopy(self.snapshot), "GIF"),
-               daemon=True
-               ).start()
-        self.state_change_count += 1
+        for i in range(3):
+            Thread(target=self.record_gifs, daemon=True).start()
+
+    def record_gifs(self):
+        while True:
+            gif = self.gif_queue.get()
+            count, state, snapshot = gif
+            imageio.mimsave(f"tmp/{count} {state}.gif", snapshot, "GIF")
 
     @staticmethod
     def determine_state(states):
@@ -72,7 +75,6 @@ class VideoProcessor:
         MIN_TIME_SPENT_IN_STATE = 2
         offset = 33
 
-
         states = ["Error"] * len(self.models)
         debug_image = [None] * len(self.models)
         for i, model in enumerate(self.models):
@@ -100,8 +102,8 @@ class VideoProcessor:
         state_changed = resulting_state != self.previous_state
 
         if state_changed and self.previous_state is not None:
-                # and (self.state_change_time is None or (time.time() - self.state_change_time > MIN_TIME_SPENT_IN_STATE)):
-
+            # and (self.state_change_time is None or (time.time() - self.state_change_time > MIN_TIME_SPENT_IN_STATE)):
+            self.state_change_count += 1
             self.state_change_time = time.time()
 
             self.image_id += 1
@@ -119,11 +121,16 @@ class VideoProcessor:
             )
 
             if self.debug:
-                self.record_gif(state=f"from {self.previous_state} to {resulting_state}")
+                self.gif_queue.put(
+                    (
+                        self.state_change_count,
+                        resulting_state,
+                        copy.copy(self.snapshot),
+                    )
+                )
                 print(f"[{resulting_state}] {timestamp}")
         self.previous_state = resulting_state
 
-        time.sleep(0.1377)
         if self.debug:
             return debug_image[PICTURE_TO_CHOOSE]
         else:
@@ -139,7 +146,11 @@ class PythonicVideoTracker(Tracker):
         self.processor = VideoProcessor(models=self.models, debug=self.debug)
 
     def track(self):
-        with LockedCamera(self.source, process=self.processor, display="Live Feed") as cam:
-            cam.stream()
-
-# writer = DatabaseWriter()
+        # TODO: investigate the bug where image doesnt close immediately
+        with SlowCamera(self.source
+                        , display="Live Feed"
+                        # , process=self.processor
+                        ) as cam:
+            for status, frame in cam:
+                frame = self.processor(frame)
+                cv2.imshow("Live Feed", frame)
