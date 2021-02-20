@@ -16,6 +16,7 @@ from device_tracking import Tracker
 
 class VideoProcessor:
     GIF_LENGTH = 10
+    DELAY = 1
 
     def __init__(self, models, debug):
         super(VideoProcessor, self).__init__()
@@ -69,7 +70,10 @@ class VideoProcessor:
             # TODO: need other signal data
             return "Inconsistent"
 
-    def __call__(self, img):  # TODO: refactor; It does not track both models...
+    def set_cam(self, cam):
+        self._cam = cam
+
+    def preprocess(self, img):
         # TODO: ubrat' eto gavno s debug_image[PICTURE_TO_CHOOSE]
         PICTURE_TO_CHOOSE = 0
         MIN_TIME_SPENT_IN_STATE = 2
@@ -131,6 +135,10 @@ class VideoProcessor:
                 print(f"[{resulting_state}] {timestamp}")
         self.previous_state = resulting_state
 
+        start = time.perf_counter()
+        while time.perf_counter() - start < self.DELAY:
+            self._cam.grab()
+
         if self.debug:
             return debug_image[PICTURE_TO_CHOOSE]
         else:
@@ -147,10 +155,10 @@ class PythonicVideoTracker(Tracker):
 
     def track(self):
         # TODO: investigate the bug where image doesnt close immediately
-        with SlowCamera(self.source
-                        , display="Live Feed"
-                        # , process=self.processor
-                        ) as cam:
-            for status, frame in cam:
-                frame = self.processor(frame)
-                cv2.imshow("Live Feed", frame)
+        with LockedCamera(self.source
+                , display="Live Feed"
+                , preprocess=self.processor.preprocess
+                          # , process=self.processor
+                          ) as cam:
+            self.processor.set_cam(cam)
+            cam.stream()
