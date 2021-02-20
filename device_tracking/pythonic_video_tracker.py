@@ -16,7 +16,7 @@ from device_tracking import Tracker
 
 class VideoProcessor:
     GIF_LENGTH = 10
-    DELAY = 1
+    FPS = 5
 
     def __init__(self, models, debug):
         super(VideoProcessor, self).__init__()
@@ -143,7 +143,7 @@ class VideoProcessor:
         self.previous_state = resulting_state
 
         start = time.perf_counter()
-        while time.perf_counter() - start < self.DELAY:
+        while time.perf_counter() - start < 1 / self.FPS:
             self._cam.grab()
 
         if self.debug:
