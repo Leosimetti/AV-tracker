@@ -12,6 +12,7 @@ class WebWindow:
         self.open = True
         self.msg = "sas"
 
+
     def create_window(self):
 
         app = Flask(__name__)
@@ -19,24 +20,20 @@ class WebWindow:
         # Feed it the flask app instance
         ui = FlaskUI(app)
 
+        def sas():
+            self.open = False
+            exit()
+
+        ui.on_exit = sas
+
         @app.route('/')
         def stream():
-            def gen():
-                try:
-                    yield render_template("base.html")
-                    while True:
-                        data = ' '
-                        yield data
-                        # i += 1
-                        # pass
-                        # time.sleep(0.5)
-                except GeneratorExit:
-                    self.open = False
+            return render_template("base.html")
 
-            return Response(stream_with_context(gen()))
 
         @app.route("/exit", methods=['POST'])
-        def move_forward():
+        def leave():
+            self.open = False
             # Moving forward code
             # forward_message = "Exitting..."
             exit()

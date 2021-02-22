@@ -1,18 +1,125 @@
-<form name="myForm" action="/" method="post" onsubmit="">
-    <p>
-        <input type="radio" name="radio" id="Enabled"> Enabled <br>
-        <input type="radio" name="radio" id="Disabled" checked="checked"> Disabled <br>
-    </p>
-    <p><input type=submit value=Apply></p>
-</form>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var url = 'http://127.0.0.1:5001/GUI-is-still-open';
+    fetch(url, { mode: 'no-cors'});
+    setInterval(function(){ fetch(url, { mode: 'no-cors'});}, 5000)();
+});
+</script>
+
+<div class='container'>
+
+    <div class="column">
+
+        <h1> Control panel </h1>
 
 
-<form action="/exit" method="post">
-    <button name="exitBtn" type="submit">Exit</button>
-</form>
+        <input type="range" value="1" min="1" max="100" oninput="this.nextElementSibling.value = this.value">
+        <output>1</output>
+
+        <br>
+        <input type="range" value="1" min="1" max="100" oninput="this.nextElementSibling.value = this.value">
+        <output>1</output>
+        <br>
+        <input type="range" value="1" min="1" max="100" oninput="this.nextElementSibling.value = this.value">
+        <output>1</output>
+        <br>
+
+        <h3> Mouse tracking </h3>
+        <p>
+            <input type="radio" name="Mradio" id="MEnabled"> Enabled <br>
+            <input type="radio" name="Mradio" id="MDisabled" checked="checked"> Disabled <br>
+        </p>
+
+
+        <h3> Keyboard tracking </h3>
+        <p>
+            <input type="radio" name="Kradio" id="KEnabled"> Enabled <br>
+            <input type="radio" name="Kradio" id="KDisabled" checked="checked"> Disabled <br>
+        </p>
+
+
+        <h3> Video tracking </h3>
+        <p>
+            <input type="radio" name="Vradio" id="VEnabled"> Enabled <br>
+            <input type="radio" name="Vradio" id="VDisabled" checked="checked"> Disabled <br>
+        </p>
+    </div>
+
+
+    <div class="column">
+        <h1> Display panel </h1>
+
+        <div class="state">
+            <h3> Mouse state </h3>
+            <button disabled> KEK</button>
+        </div>
+
+        <div class="state">
+            <h3> Keyboard state </h3>
+            <button disabled>KKE</button>
+        </div>
+
+        <div class="exit">
+            <form action="/exit" method="post">
+                <button name="exitBtn" type="submit">Exit</button>
+            </form>
+        </div>
+
+    </div>
+
+
+</div>
+
+<!--<form name="myForm" action="/" method="post" onsubmit="">-->
+<!--    <p>-->
+<!--        <input type="radio" name="radio" id="Enabled"> Enabled <br>-->
+<!--        <input type="radio" name="radio" id="Disabled" checked="checked"> Disabled <br>-->
+<!--    </p>-->
+<!--    <p><input type=submit value=Apply></p>-->
+<!--</form>-->
+
 
 <audio src="http://91.219.74.220:8000/Vanya-high.mp3" autoplay></audio>
 
+
+<style type="text/css">
+
+    body{
+        background-color: darkseagreen;
+    }
+
+    .container {
+        height: 100%;
+        /*width: 100%;*/
+        display: flex;
+        /*width: auto;*/
+        /*align-items: center;*/
+        justify-content: space-evenly;
+    }
+
+    .column {
+        border: 1px #006699 solid;
+        border-radius: 15px;
+    }
+
+    h1 {
+        margin-top: 0;
+        align-content: center;
+    }
+
+    .state {
+        display: flex;
+        /*border: 1px outset blue;*/
+        /*background-color: lightBlue;*/
+        /*height: 50px;*/
+        /*width: 50px;*/
+    }
+
+    .exit {
+        cursor: pointer;
+    }
+
+</style>
 
 <!--<script>-->
 

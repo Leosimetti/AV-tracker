@@ -16,7 +16,7 @@ from device_tracking import Tracker
 
 class VideoProcessor:
     GIF_LENGTH = 10
-    FPS = 5
+    FPS = 4
 
     def __init__(self, models, debug):
         super(VideoProcessor, self).__init__()
@@ -40,7 +40,7 @@ class VideoProcessor:
         self.gif_queue = SimpleQueue()
         self.state_change_time = None
 
-        for i in range(3):
+        for i in range(2):
             Thread(target=self.record_gifs, daemon=True).start()
 
     def record_gifs(self):
@@ -153,6 +153,7 @@ class VideoProcessor:
 
 
 class PythonicVideoTracker(Tracker):
+    RECORDING = True
 
     def __init__(self, source, debug, models):
         self.source = source
@@ -168,4 +169,4 @@ class PythonicVideoTracker(Tracker):
                           # , process=self.processor
                           ) as cam:
             self.processor.set_cam(cam)
-            cam.stream()
+            cam.headless_stream()

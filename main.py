@@ -47,7 +47,13 @@ if __name__ == "__main__":
                                          debug=DEBUG,
                                          models=[DNNModel(DEBUG), KerasPBModel(DEBUG)]
     )
-    video_tracker.track()
+
+    threading.Thread(
+        target=video_tracker.track,
+        daemon=True
+    ).start()
+
+    # video_tracker.track()
 
     # Start timer that help determine user presence based on K&M input singals
     timer = threading.Thread(target=Timer.start_timer, daemon=True)
