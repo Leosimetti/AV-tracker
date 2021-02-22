@@ -1,10 +1,70 @@
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var url = 'http://127.0.0.1:5001/GUI-is-still-open';
-    fetch(url, { mode: 'no-cors'});
-    setInterval(function(){ fetch(url, { mode: 'no-cors'});}, 5000)();
-});
+    document.addEventListener('DOMContentLoaded', function () {
+        var url = 'http://127.0.0.1:5001/GUI-is-still-open';
+        fetch(url, {mode: 'no-cors'});
+        setInterval(function () {
+            fetch(url, {mode: 'no-cors'});
+        }, 5000)();
+    });
 </script>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+
+<!-- Exit button-->
+<script type=text/javascript>
+
+    $(function () {
+        $('#test').on('click', function (e) {
+            e.preventDefault()
+            $.getJSON('/sas',
+                function (data) {
+                    //do nothing
+                });
+            return false;
+        });
+    });
+
+    $(function () {
+        $('#exit').on('click', function (e) {
+            e.preventDefault()
+            $.getJSON('/exit',
+                function (data) {
+                    //do nothing
+                });
+            setTimeout(() => {
+                window.location.replace("javascript:window.open('','_self').close();");
+            }, 500);
+
+            return false;
+        });
+    });
+
+
+    function video_toggled(myRadio) {
+
+        if (myRadio.value == 1) {
+            var timestamp = new Date().getTime();
+            $('img').attr('src', "/video_feed")
+            $.getJSON('/video_enable',
+                function (data) {
+                    //do nothing
+                });
+        } else {
+            $('img').attr('src', "https://www.redditstatic.com/desktop2x/img/widgets/rereddit-promo/center.png")
+            $.getJSON('/video_disable',
+                function (data) {
+                    //do nothing
+                });
+        }
+
+        return false
+
+    }
+
+
+</script>
+
 
 <div class='container'>
 
@@ -40,11 +100,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
         <h3> Video tracking </h3>
         <p>
-            <input type="radio" name="Vradio" id="VEnabled"> Enabled <br>
-            <input type="radio" name="Vradio" id="VDisabled" checked="checked"> Disabled <br>
+            <input type="radio" name="Vradio" id="VEnabled" value="1" onclick="video_toggled(this)" checked="checked">
+            Enabled <br>
+            <input type="radio" name="Vradio" id="VDisabled"  value="0" onclick="video_toggled(this)">
+            Disabled <br>
         </p>
     </div>
 
+
+    <div class="column">
+        <img src="{{ url_for('video_feed') }}" width="100%" id="video">
+    </div>
 
     <div class="column">
         <h1> Display panel </h1>
@@ -61,9 +127,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         <div class="exit">
             <form action="/exit" method="post">
-                <button name="exitBtn" type="submit">Exit</button>
+                <button name="exitBtn" type="submit" id="exit">Exit</button>
             </form>
+
         </div>
+
 
     </div>
 
@@ -84,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <style type="text/css">
 
-    body{
+    body {
         background-color: darkseagreen;
     }
 

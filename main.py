@@ -36,11 +36,8 @@ if __name__ == "__main__":
     mouse_tracker = MouseTracker(DEBUG)
     mouse_tracker.track()
 
-    w = WebWindow()
-    threading.Thread(
-        target=w.create_window,
-        daemon=True
-    ).start()
+    timer = threading.Thread(target=Timer.start_timer, daemon=True)
+    timer.start()
 
     # Video tracker
     video_tracker = PythonicVideoTracker(source=0,
@@ -48,19 +45,28 @@ if __name__ == "__main__":
                                          models=[DNNModel(DEBUG), KerasPBModel(DEBUG)]
     )
 
-    threading.Thread(
-        target=video_tracker.track,
-        daemon=True
-    ).start()
+
+    w = WebWindow(video_tracker)
+    w.create_window()
+
+
+    # threading.Thread(
+    #     target=w.create_window,
+    #     daemon=True
+    # ).start()
+
+    # video_tracker.track()
+
+    # threading.Thread(
+    #     target=video_tracker.track,
+    #     daemon=True
+    # ).start()
 
     # video_tracker.track()
 
     # Start timer that help determine user presence based on K&M input singals
-    timer = threading.Thread(target=Timer.start_timer, daemon=True)
-    timer.start()
+    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
 
-    while w.open:
-        pass
-
-    exit()
+    # while w.open:
+    #     pass

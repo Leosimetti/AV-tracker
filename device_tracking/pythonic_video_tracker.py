@@ -16,7 +16,7 @@ from device_tracking import Tracker
 
 class VideoProcessor:
     GIF_LENGTH = 10
-    FPS = 4
+    FPS = 30
 
     def __init__(self, models, debug):
         super(VideoProcessor, self).__init__()
@@ -46,8 +46,8 @@ class VideoProcessor:
     def record_gifs(self):
         while True:
             gif = self.gif_queue.get()
-            count, state, snapshot = gif
-            imageio.mimsave(f"tmp/{count} {state}.gif", snapshot, "GIF")
+            count, state, prev_state, snapshot = gif
+            imageio.mimsave(f"tmp/{count} {prev_state} to {state}.gif", snapshot, "GIF")
 
     @staticmethod
     def put_outlined_text(img, text, where):
@@ -136,6 +136,7 @@ class VideoProcessor:
                     (
                         self.state_change_count,
                         resulting_state,
+                        self.previous_state,
                         copy.copy(self.snapshot),
                     )
                 )
@@ -163,10 +164,25 @@ class PythonicVideoTracker(Tracker):
 
     def track(self):
         # TODO: investigate the bug where image doesnt close immediately
+        # self.RECORDING = True
+
         with LockedCamera(self.source
                 , display="Live Feed"
                 , preprocess=self.processor.preprocess
                           # , process=self.processor
                           ) as cam:
             self.processor.set_cam(cam)
-            cam.headless_stream()
+            # cam.headless_stream()
+            for status, frame in cam:
+                ret, buffer = cv2.imencode('.jpg', frame)
+                frame = buffer.tobytes()
+
+                if not self.RECORDING:
+                    yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + b'000000000000' + b'\r\n')
+                else:
+                    yield (b'--frame\r\n'
+                           b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+    def stop_tracking(self):
+        self.RECORDING = False
