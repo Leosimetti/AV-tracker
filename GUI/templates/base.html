@@ -1,4 +1,7 @@
-<script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+
+<script type=text/javascript>
     document.addEventListener('DOMContentLoaded', function () {
         var url = 'http://127.0.0.1:5001/GUI-is-still-open';
         fetch(url, {mode: 'no-cors'});
@@ -6,23 +9,7 @@
             fetch(url, {mode: 'no-cors'});
         }, 5000)();
     });
-</script>
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-
-
-<!-- Exit button-->
-<script type=text/javascript>
-    $(function () {
-        $('#test').on('click', function (e) {
-            e.preventDefault()
-            $.getJSON('/sas',
-                function (data) {
-                    //do nothing
-                });
-            return false;
-        });
-    });
 
     $(function () {
         $('#exit').on('click', function (e) {
