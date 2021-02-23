@@ -64,16 +64,20 @@
 
     function keyboard_toggled(myRadio) {
         if (myRadio.value === "1") {
-            $.getJSON('/keyboard_enable',
-                function (data) {
-                    //do nothing
-                });
+            $.getJSON('/keyboard_enable', function (data) {});
         } else {
-            $.getJSON('/keyboard_disable',
-                function (data) {
-                    //do nothing
-                });
+            $.getJSON('/keyboard_disable', function (data) {});
         }
+        return false
+    }
+
+    function mouse_toggled(myRadio) {
+        if (myRadio.value === "1") {
+            $.getJSON('/mouse_enable', function (data) {});
+        } else {
+            $.getJSON('/mouse_disable', function (data) {});
+        }
+        return false
     }
 
 
@@ -100,8 +104,9 @@
 
         <h3> Mouse tracking </h3>
         <p>
-            <input type="radio" name="Mradio" id="MEnabled"> Enabled <br>
-            <input type="radio" name="Mradio" id="MDisabled" checked="checked"> Disabled <br>
+            <input type="radio" name="Mradio" id="MEnabled" value="1" onclick="mouse_toggled(this)"
+                   checked="checked"> Enabled <br>
+            <input type="radio" name="Mradio" id="MDisabled" value="0" onclick="mouse_toggled(this)"> Disabled <br>
         </p>
 
 

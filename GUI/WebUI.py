@@ -50,6 +50,19 @@ class WebWindow:
             tracker.track()
             return Response("Keyboard tracking enabled")
 
+        @app.route('/mouse_disable')
+        def mouse_disable():
+            import mouse
+            mouse.unhook_all()
+            return Response("Mouse tracking disabled")
+
+        @app.route('/mouse_enable')
+        def mouse_enable():
+            from device_tracking.mouse_tracker import MouseTracker
+            tracker = MouseTracker(True)
+            tracker.track()
+            return Response("Mouse tracking enabled")
+
         @app.route('/video_disable')
         def video_disable():
             self.video_tracker.RECORDING = False
