@@ -78,10 +78,5 @@ class WebWindow:
             self.on_exit()
             # return Response("")
 
-
-        @app.route('/KM_state')
-        def KM_state():
-            return Response(str(time.time()))
-
         # call the 'run' method
         ui.run()
