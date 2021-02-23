@@ -16,7 +16,7 @@ from device_tracking import Tracker
 
 class VideoProcessor:
     GIF_LENGTH = 10
-    FPS = 30
+    FPS = 5
 
     def __init__(self, models, debug):
         super(VideoProcessor, self).__init__()

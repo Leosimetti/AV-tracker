@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, request
 from flaskwebgui import FlaskUI
 import time
 import os
@@ -78,6 +78,11 @@ class WebWindow:
         def km_state():
             bool_to_state = {False: "Present", True: "Absent"}
             return bool_to_state[Timer.time_left < 1]
+
+        @app.route('/change_fps', methods=['POST'])
+        def change_fps():
+            self.video_tracker.processor.FPS = int(request.values['fps'])
+            return Response("Changed FPS")
 
         @app.route("/exit")
         def leave():

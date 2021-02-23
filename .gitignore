@@ -145,3 +145,4 @@ dmypy.json
 #sqlite stuff
 *.sqlite
 data2.zip
+db/signals.sqlite-journal
