@@ -143,15 +143,11 @@
 
 
     <div class="column">
-        <img src="{{ url_for('video_feed') }}" width="100%" id="video">
-    </div>
-
-    <div class="column">
         <h1> Display panel </h1>
-
-        <h3> Activity state </h3>
-        <br>
-        <span id="activity-state">Active</span>
+        <img src="{{ url_for('video_feed') }}" width="100%" id="video">
+        <h2>
+            <span id="activity-state">Active</span>
+        </h2>
 
         <div class="exit">
             <form action="/exit" method="post">
@@ -200,19 +196,17 @@
 
     h1 {
         margin-top: 0;
-        align-content: center;
+        text-align: center;
     }
 
-    .state {
+    .exit{
         display: flex;
-        /*border: 1px outset blue;*/
-        /*background-color: lightBlue;*/
-        /*height: 50px;*/
-        /*width: 50px;*/
+        justify-content: center;
     }
 
-    .exit {
-        cursor: pointer;
+    #activity-state {
+        display: flex;
+        justify-content: center;
     }
 
 </style>
