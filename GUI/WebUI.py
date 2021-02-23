@@ -77,7 +77,7 @@ class WebWindow:
         @app.route('/km_state')
         def km_state():
             bool_to_state = {False: "Present", True: "Absent"}
-            return bool_to_state[Timer.time_left<1]
+            return bool_to_state[Timer.time_left < 1]
 
         @app.route("/exit")
         def leave():

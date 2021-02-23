@@ -41,21 +41,29 @@
 
 
     function video_toggled(myRadio) {
+        // $('#VDisabled').attr("disabled", true)
+        // $('#VEnabled').attr("disabled", true)
 
         if (myRadio.value === "1") {
-            var timestamp = new Date().getTime();
             $('img').attr('src', "/video_feed")
             $.getJSON('/video_enable',
                 function (data) {
                     //do nothing
                 });
         } else {
-            $('img').attr('src', "https://www.redditstatic.com/desktop2x/img/widgets/rereddit-promo/center.png")
+            $('img').attr('src', "https://i.kym-cdn.com/photos/images/newsfeed/001/948/851/b69.png")
+            $('img').attr('width', "320")
+            $('img').attr('height', "240")
             $.getJSON('/video_disable',
                 function (data) {
                     //do nothing
                 });
         }
+
+        // setTimeout(() => {
+        //     $('#VDisabled').attr("disabled", false)
+        //     $('#VEnabled').attr("disabled", false)
+        // }, 9000);
 
         return false
 
@@ -199,7 +207,7 @@
         text-align: center;
     }
 
-    .exit{
+    .exit {
         display: flex;
         justify-content: center;
     }

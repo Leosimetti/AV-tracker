@@ -161,28 +161,18 @@ class PythonicVideoTracker(Tracker):
         self.models = models
         self.debug = debug
         self.processor = VideoProcessor(models=self.models, debug=self.debug)
+        self.cam = LockedCamera(self.source,
+                                preprocess=self.processor.preprocess
+                                )
+        self.processor.set_cam(self.cam)
+
 
     def track(self):
-        # TODO: investigate the bug where image doesnt close immediately
-        # self.RECORDING = True
 
-        with LockedCamera(self.source
-                , display="Live Feed"
-                , preprocess=self.processor.preprocess
-                          # , process=self.processor
-                          ) as cam:
-            self.processor.set_cam(cam)
-            # cam.headless_stream()
-            for status, frame in cam:
+        if self.RECORDING:
+            for status, frame in self.cam:
                 ret, buffer = cv2.imencode('.jpg', frame)
                 frame = buffer.tobytes()
 
-                if not self.RECORDING:
-                    yield (b'--frame\r\n'
-                       b'Content-Type: image/jpeg\r\n\r\n' + b'000000000000' + b'\r\n')
-                else:
-                    yield (b'--frame\r\n'
-                           b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-    def stop_tracking(self):
-        self.RECORDING = False
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
