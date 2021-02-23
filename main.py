@@ -43,12 +43,10 @@ if __name__ == "__main__":
     video_tracker = PythonicVideoTracker(source=0,
                                          debug=DEBUG,
                                          models=[DNNModel(DEBUG), KerasPBModel(DEBUG)]
-    )
-
+                                         )
 
     w = WebWindow(video_tracker)
     w.create_window()
-
 
     # threading.Thread(
     #     target=w.create_window,
@@ -65,8 +63,8 @@ if __name__ == "__main__":
     # video_tracker.track()
 
     # Start timer that help determine user presence based on K&M input singals
-    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-
+    print(
+        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
     # while w.open:
     #     pass

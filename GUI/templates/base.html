@@ -43,7 +43,7 @@
 
     function video_toggled(myRadio) {
 
-        if (myRadio.value == 1) {
+        if (myRadio.value === "1") {
             var timestamp = new Date().getTime();
             $('img').attr('src', "/video_feed")
             $.getJSON('/video_enable',
@@ -60,6 +60,20 @@
 
         return false
 
+    }
+
+    function keyboard_toggled(myRadio) {
+        if (myRadio.value === "1") {
+            $.getJSON('/keyboard_enable',
+                function (data) {
+                    //do nothing
+                });
+        } else {
+            $.getJSON('/keyboard_disable',
+                function (data) {
+                    //do nothing
+                });
+        }
     }
 
 
@@ -93,8 +107,9 @@
 
         <h3> Keyboard tracking </h3>
         <p>
-            <input type="radio" name="Kradio" id="KEnabled"> Enabled <br>
-            <input type="radio" name="Kradio" id="KDisabled" checked="checked"> Disabled <br>
+            <input type="radio" name="Kradio" id="KEnabled" value="1" onclick="keyboard_toggled(this)"
+                   checked="checked"> Enabled <br>
+            <input type="radio" name="Kradio" id="KDisabled" value="0" onclick="keyboard_toggled(this)"> Disabled <br>
         </p>
 
 
@@ -102,7 +117,7 @@
         <p>
             <input type="radio" name="Vradio" id="VEnabled" value="1" onclick="video_toggled(this)" checked="checked">
             Enabled <br>
-            <input type="radio" name="Vradio" id="VDisabled"  value="0" onclick="video_toggled(this)">
+            <input type="radio" name="Vradio" id="VDisabled" value="0" onclick="video_toggled(this)">
             Disabled <br>
         </p>
     </div>

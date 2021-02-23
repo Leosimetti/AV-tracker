@@ -13,7 +13,6 @@ class WebWindow:
         self.video_tracker = video_tracker
 
     def on_exit(self):
-
         import keyboard
         import mouse
 
@@ -23,16 +22,12 @@ class WebWindow:
         self.video_tracker.RECORDING = False
         os._exit(0)
 
-
     def create_window(self):
-
         app = Flask(__name__)
 
         # Feed it the flask app instance
         ui = FlaskUI(app)
         ui.on_exit = self.on_exit
-
-
 
         @app.route('/video_feed')
         def video_feed():
@@ -42,17 +37,28 @@ class WebWindow:
         def stream():
             return render_template("base.html")
 
+        @app.route('/keyboard_disable')
+        def keyboard_disable():
+            import keyboard
+            keyboard.unhook_all()
+            return Response("Keyboard tracking disabled")
+
+        @app.route('/keyboard_enable')
+        def keyboard_enable():
+            from device_tracking.keyboard_tracker import KeyboardTracker
+            tracker = KeyboardTracker(True)
+            tracker.track()
+            return Response("Keyboard tracking enabled")
+
         @app.route('/video_disable')
         def video_disable():
             self.video_tracker.RECORDING = False
-            return Response("")
-
+            return Response("Video tracking disabled")
 
         @app.route('/video_enable')
         def video_enable():
             self.video_tracker.RECORDING = True
-            return Response("")
-
+            return Response("Video tracking enabled")
 
         @app.route("/exit")
         def leave():
