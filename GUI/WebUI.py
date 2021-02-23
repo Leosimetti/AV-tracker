@@ -15,10 +15,10 @@ class WebWindow:
 
     def on_exit(self):
         import keyboard
-        import mouse
+        # import mouse
 
         keyboard.unhook_all()
-        mouse.unhook_all()
+        # mouse.unhook_all()
 
         self.video_tracker.RECORDING = False
         os._exit(0)
