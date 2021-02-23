@@ -13,7 +13,6 @@
 
 <!-- Exit button-->
 <script type=text/javascript>
-
     $(function () {
         $('#test').on('click', function (e) {
             e.preventDefault()
@@ -64,21 +63,36 @@
 
     function keyboard_toggled(myRadio) {
         if (myRadio.value === "1") {
-            $.getJSON('/keyboard_enable', function (data) {});
+            $.getJSON('/keyboard_enable', function (data) {
+            });
         } else {
-            $.getJSON('/keyboard_disable', function (data) {});
+            $.getJSON('/keyboard_disable', function (data) {
+            });
         }
         return false
     }
 
     function mouse_toggled(myRadio) {
         if (myRadio.value === "1") {
-            $.getJSON('/mouse_enable', function (data) {});
+            $.getJSON('/mouse_enable', function (data) {
+            });
         } else {
-            $.getJSON('/mouse_disable', function (data) {});
+            $.getJSON('/mouse_disable', function (data) {
+            });
         }
         return false
     }
+
+    setInterval(() => {
+        $.ajax({
+            url: "/km_state",
+            dataType: "text",
+            success: function (data) {
+                console.log(data)
+                $('#activity-state').text(data);
+            },
+        });
+    }, 1000);
 
 
 </script>
@@ -135,15 +149,9 @@
     <div class="column">
         <h1> Display panel </h1>
 
-        <div class="state">
-            <h3> Mouse state </h3>
-            <button disabled> KEK</button>
-        </div>
-
-        <div class="state">
-            <h3> Keyboard state </h3>
-            <button disabled>KKE</button>
-        </div>
+        <h3> Activity state </h3>
+        <br>
+        <span id="activity-state">Active</span>
 
         <div class="exit">
             <form action="/exit" method="post">

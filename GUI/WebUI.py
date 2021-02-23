@@ -2,6 +2,7 @@ from flask import Flask, render_template, Response
 from flaskwebgui import FlaskUI
 import time
 import os
+from db.timer import Timer
 
 
 # http://fm.1tvcrimea.ru:8000/stream.mp3
@@ -72,6 +73,11 @@ class WebWindow:
         def video_enable():
             self.video_tracker.RECORDING = True
             return Response("Video tracking enabled")
+
+        @app.route('/km_state')
+        def km_state():
+            bool_to_state = {False: "Present", True: "Absent"}
+            return bool_to_state[Timer.time_left<1]
 
         @app.route("/exit")
         def leave():
