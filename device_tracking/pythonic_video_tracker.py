@@ -166,7 +166,6 @@ class PythonicVideoTracker(Tracker):
                                 )
         self.processor.set_cam(self.cam)
 
-
     def track(self):
 
         if self.RECORDING:
