@@ -6,7 +6,7 @@ from db.processed_signals_db import *
 from db.signals_db import *
 from db.timer import Timer
 from db.video_data_db import *
-from device_tracking.mouse_tracker import MouseTracker
+# from device_tracking.mouse_tracker import MouseTracker
 from device_tracking.keyboard_tracker import KeyboardTracker
 from device_tracking.pythonic_video_tracker import PythonicVideoTracker
 from models.DNN_model import DNNModel
@@ -33,8 +33,8 @@ if __name__ == "__main__":
     kb_tracker = KeyboardTracker(DEBUG)
     kb_tracker.track()
 
-    mouse_tracker = MouseTracker(DEBUG)
-    mouse_tracker.track()
+    # mouse_tracker = MouseTracker(DEBUG)
+    # mouse_tracker.track()
 
     timer = threading.Thread(target=Timer.start_timer, daemon=True)
     timer.start()
@@ -47,24 +47,3 @@ if __name__ == "__main__":
 
     w = WebWindow(video_tracker)
     w.create_window()
-
-    # threading.Thread(
-    #     target=w.create_window,
-    #     daemon=True
-    # ).start()
-
-    # video_tracker.track()
-
-    # threading.Thread(
-    #     target=video_tracker.track,
-    #     daemon=True
-    # ).start()
-
-    # video_tracker.track()
-
-    # Start timer that help determine user presence based on K&M input singals
-    print(
-        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-
-    # while w.open:
-    #     pass

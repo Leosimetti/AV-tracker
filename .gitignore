@@ -144,3 +144,4 @@ dmypy.json
 
 #sqlite stuff
 *.sqlite
+data2.zip
