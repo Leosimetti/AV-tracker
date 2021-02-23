@@ -28,18 +28,14 @@ class Timer:
     def start_timer(cls):
         while True:
             if cls.time_left > 0:
-                print("PRESENT")
                 insert_processed_data("Present")
                 cls.is_absent = False
-                print(cls.is_absent)
             while cls.time_left > 0:
                 time.sleep(1)
                 cls.time_left -= 1
             if not cls.is_absent:
-                print("NOTPRESENT")
                 insert_processed_data("Absent")
                 cls.is_absent = True
-                print(cls.is_absent)
                 time.sleep(1)
 
     @classmethod
