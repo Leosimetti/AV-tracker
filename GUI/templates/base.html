@@ -67,6 +67,18 @@
         return false
     }
 
+    function radio_toggled(myRadio) {
+
+        let aud = document.querySelector('audio')
+
+        if (myRadio.value === "1") {
+            aud.play()
+        } else {
+            aud.pause()
+        }
+        return false
+    }
+
     function mouse_toggled(myRadio) {
         if (myRadio.value === "1") {
             $.getJSON('/mouse_enable', function (data) {
@@ -91,7 +103,7 @@
 
 
     function change_fps(value) {
-        $.post("/change_fps",{"fps" : value});
+        $.post("/change_fps", {"fps": value});
         return false
     }
 
@@ -141,6 +153,15 @@
             <input type="radio" name="Vradio" id="VDisabled" value="0" onclick="video_toggled(this)">
             Disabled <br>
         </p>
+
+        <h3> True radio button </h3>
+        <p>
+            <input type="radio" name="Radio" id="REnabled" value="1" onclick="radio_toggled(this)" >
+            Enabled <br>
+            <input type="radio" name="Radio" id="RDisabled" value="0" onclick="radio_toggled(this)" checked="checked">
+            Disabled <br>
+        </p>
+
     </div>
 
 
@@ -150,6 +171,7 @@
         <h2>
             <span id="activity-state">Active</span>
         </h2>
+
 
         <div class="exit">
             <form action="/exit" method="post">
@@ -173,7 +195,7 @@
 <!--</form>-->
 
 
-<audio src="http://91.219.74.220:8000/Vanya-high.mp3" autoplay></audio>
+<audio src="http://91.219.74.220:8000/Vanya-high.mp3"></audio>
 
 
 <style type="text/css">
