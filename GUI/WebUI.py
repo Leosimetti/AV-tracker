@@ -84,6 +84,12 @@ class WebWindow:
             self.video_tracker.processor.FPS = int(request.values['fps'])
             return Response("Changed FPS")
 
+        @app.route('/change_threshold', methods=['POST'])
+        def change_threshold():
+            new_threshold = int(request.values['new_threshold'])
+            Timer(new_threshold)
+            return Response("Changed timer threshold")
+
         @app.route("/exit")
         def leave():
             self.on_exit()

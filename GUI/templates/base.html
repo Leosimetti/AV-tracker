@@ -108,6 +108,12 @@
     }
 
 
+    function change_threshold(value) {
+        $.post("/change_threshold", {"new_threshold": value});
+        return false
+    }
+
+
 </script>
 
 
@@ -120,6 +126,11 @@
         <h2> FPS control </h2>
         <input type="range" value="5" min="1" max="24"
                oninput="this.nextElementSibling.value = this.value; change_fps(this.value) ">
+        <output>5</output>
+
+        <h2> Timer control </h2>
+        <input type="range" value="5" min="1" max="24"
+               oninput="this.nextElementSibling.value = this.value; change_threshold(this.value) ">
         <output>5</output>
 
         <br>
@@ -156,7 +167,7 @@
 
         <h3> True radio button </h3>
         <p>
-            <input type="radio" name="Radio" id="REnabled" value="1" onclick="radio_toggled(this)" >
+            <input type="radio" name="Radio" id="REnabled" value="1" onclick="radio_toggled(this)">
             Enabled <br>
             <input type="radio" name="Radio" id="RDisabled" value="0" onclick="radio_toggled(this)" checked="checked">
             Disabled <br>
