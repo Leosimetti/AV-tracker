@@ -2,14 +2,6 @@
 
 
 <script type=text/javascript>
-    document.addEventListener('DOMContentLoaded', function () {
-        var url = 'http://127.0.0.1:5001/GUI-is-still-open';
-        fetch(url, {mode: 'no-cors'});
-        setInterval(function () {
-            fetch(url, {mode: 'no-cors'});
-        }, 5000)();
-    });
-
 
     $(function () {
         $('#exit').on('click', function (e) {
@@ -90,6 +82,10 @@
         return false
     }
 
+    window.addEventListener('beforeunload',function () {
+        navigator.sendBeacon('/exit')
+    });
+
     setInterval(() => {
         $.ajax({
             url: "/km_state",
@@ -125,7 +121,7 @@
 
         <h2> FPS control </h2>
         <input type="range" value="5" min="1" max="24"
-               oninput="this.nextElementSibling.value = this.value; change_fps(this.value) ">
+               oninput="this.nextElementSibling.value = this.value; change_fps(this.value)">
         <output>5</output>
 
         <h2> Timer control </h2>
