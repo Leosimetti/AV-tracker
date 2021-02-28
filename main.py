@@ -47,24 +47,3 @@ if __name__ == "__main__":
 
     w = WebWindow(video_tracker)
     w.create_window()
-
-    # threading.Thread(
-    #     target=w.create_window,
-    #     daemon=True
-    # ).start()
-
-    # video_tracker.track()
-
-    # threading.Thread(
-    #     target=video_tracker.track,
-    #     daemon=True
-    # ).start()
-
-    # video_tracker.track()
-
-    # Start timer that help determine user presence based on K&M input singals
-    print(
-        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-
-    # while w.open:
-    #     pass

@@ -3,7 +3,6 @@ from flask import Flask, render_template, Response, request
 import time
 import os
 from db.timer import Timer
-from flask_socketio import SocketIO, emit
 import webbrowser
 
 # http://fm.1tvcrimea.ru:8000/stream.mp3
@@ -26,15 +25,6 @@ class WebWindow:
 
     def create_window(self):
         app = Flask(__name__)
-
-        app.config['SECRET_KEY'] = 'secret!'
-        socketio = SocketIO(app)
-
-        # Feed it the flask app instance
-
-
-        # ui = FlaskUI(app)
-        # ui.on_exit = self.on_exit
 
         @app.route('/video_feed')
         def video_feed():
@@ -103,4 +93,4 @@ class WebWindow:
 
         # call the 'run' method
         webbrowser.open('http://127.0.0.1:5000/ ', new=2)
-        socketio.run(app)
+        app.run()
