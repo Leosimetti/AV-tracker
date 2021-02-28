@@ -1,5 +1,7 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-
+<!-- CSS only -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
 
 <script type=text/javascript>
 
@@ -19,11 +21,8 @@
     });
 
 
-    function video_toggled(myRadio) {
-        // $('#VDisabled').attr("disabled", true)
-        // $('#VEnabled').attr("disabled", true)
-
-        if (myRadio.value === "1") {
+    function video_toggled(mySwitch) {
+        if (mySwitch.checked) {
             $('img').attr('src', "/video_feed")
             $.getJSON('/video_enable',
                 function (data) {
@@ -35,21 +34,15 @@
             $('img').attr('height', "240")
             $.getJSON('/video_disable',
                 function (data) {
-                    //do nothing
                 });
         }
-
-        // setTimeout(() => {
-        //     $('#VDisabled').attr("disabled", false)
-        //     $('#VEnabled').attr("disabled", false)
-        // }, 9000);
 
         return false
 
     }
 
-    function keyboard_toggled(myRadio) {
-        if (myRadio.value === "1") {
+    function keyboard_toggled(mySwitch) {
+        if (mySwitch.checked) {
             $.getJSON('/keyboard_enable', function (data) {
             });
         } else {
@@ -71,8 +64,8 @@
         return false
     }
 
-    function mouse_toggled(myRadio) {
-        if (myRadio.value === "1") {
+    function mouse_toggled(mySwitch) {
+        if (mySwitch.checked) {
             $.getJSON('/mouse_enable', function (data) {
             });
         } else {
@@ -82,7 +75,7 @@
         return false
     }
 
-    window.addEventListener('beforeunload',function () {
+    window.addEventListener('beforeunload', function () {
         navigator.sendBeacon('/exit')
     });
 
@@ -117,51 +110,43 @@
 
     <div class="column">
 
-        <h1> Control panel </h1>
-
-        <h2> FPS control </h2>
+<!--        <span> FPS control </span>-->
+<!--        <br>-->
+        <label class="form-check-label range-label">FPS control</label>
         <input type="range" value="5" min="1" max="24"
                oninput="this.nextElementSibling.value = this.value; change_fps(this.value)">
         <output>5</output>
+        <br>
 
-        <h2> Timer control </h2>
+<!--        <span> Timer control </span>-->
+<!--        <br>-->
+        <label class="form-check-label range-label">Timer control </label>
         <input type="range" value="5" min="1" max="24"
                oninput="this.nextElementSibling.value = this.value; change_threshold(this.value) ">
         <output>5</output>
 
         <br>
-        <!--        <input type="range" value="1" min="1" max="100" oninput="this.nextElementSibling.value = this.value">-->
-        <!--        <output>1</output>-->
-        <!--        <br>-->
-        <!--        <input type="range" value="1" min="1" max="100" oninput="this.nextElementSibling.value = this.value">-->
-        <!--        <output>1</output>-->
-        <!--        <br>-->
 
-        <h3> Mouse tracking </h3>
-        <p>
-            <input type="radio" name="Mradio" id="MEnabled" value="1" onclick="mouse_toggled(this)"
-                   checked="checked"> Enabled <br>
-            <input type="radio" name="Mradio" id="MDisabled" value="0" onclick="mouse_toggled(this)"> Disabled <br>
-        </p>
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="mouseSwitch" checked
+                   onclick="mouse_toggled(this)">
+            <label class="form-check-label" for="flexSwitchCheckChecked">Mouse tracking</label>
+        </div>
 
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="keyboardSwitch" checked
+                   onclick="keyboard_toggled(this)">
+            <label class="form-check-label" for="flexSwitchCheckChecked">Keyboard tracking</label>
+        </div>
 
-        <h3> Keyboard tracking </h3>
-        <p>
-            <input type="radio" name="Kradio" id="KEnabled" value="1" onclick="keyboard_toggled(this)"
-                   checked="checked"> Enabled <br>
-            <input type="radio" name="Kradio" id="KDisabled" value="0" onclick="keyboard_toggled(this)"> Disabled <br>
-        </p>
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked
+                   onclick="video_toggled(this)">
+            <label class="form-check-label" for="flexSwitchCheckChecked">Video tracking</label>
+        </div>
 
 
-        <h3> Video tracking </h3>
-        <p>
-            <input type="radio" name="Vradio" id="VEnabled" value="1" onclick="video_toggled(this)" checked="checked">
-            Enabled <br>
-            <input type="radio" name="Vradio" id="VDisabled" value="0" onclick="video_toggled(this)">
-            Disabled <br>
-        </p>
-
-        <h3> True radio button </h3>
+        <span> Radio button </span>
         <p>
             <input type="radio" name="Radio" id="REnabled" value="1" onclick="radio_toggled(this)">
             Enabled <br>
@@ -169,23 +154,22 @@
             Disabled <br>
         </p>
 
+        <div class="exit">
+            <form action="/exit" method="post">
+                <button name="exitBtn" class="btn btn-primary" type="submit" id="exit">Exit</button>
+            </form>
+
+        </div>
     </div>
 
 
     <div class="column">
-        <h1> Display panel </h1>
         <img src="{{ url_for('video_feed') }}" width="100%" id="video">
+
+
         <h2>
-            <span id="activity-state">Active</span>
+            Input state: <span id="activity-state">Active</span>
         </h2>
-
-
-        <div class="exit">
-            <form action="/exit" method="post">
-                <button name="exitBtn" type="submit" id="exit">Exit</button>
-            </form>
-
-        </div>
 
 
     </div>
@@ -193,36 +177,40 @@
 
 </div>
 
-<!--<form name="myForm" action="/" method="post" onsubmit="">-->
-<!--    <p>-->
-<!--        <input type="radio" name="radio" id="Enabled"> Enabled <br>-->
-<!--        <input type="radio" name="radio" id="Disabled" checked="checked"> Disabled <br>-->
-<!--    </p>-->
-<!--    <p><input type=submit value=Apply></p>-->
-<!--</form>-->
-
 
 <audio src="http://91.219.74.220:8000/Vanya-high.mp3"></audio>
 
 
 <style type="text/css">
 
+    .range-label{
+        width: 100px;
+    }
+
+    #activity-state {
+        display: inline-block !important;
+        font-weight: normal;
+    }
+
     body {
-        background-color: darkseagreen;
+        display: flex;
+        background-color: #80bc00;
     }
 
     .container {
-        height: 100%;
-        /*width: 100%;*/
+        /*height: auto;*/
         display: flex;
-        /*width: auto;*/
-        /*align-items: center;*/
         justify-content: space-evenly;
+        align-self: center;
     }
 
     .column {
-        border: 1px #006699 solid;
+        height: available !important;
+        border: 5px #1a428a solid;
         border-radius: 15px;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 10px;
     }
 
     h1 {
@@ -242,14 +230,7 @@
 
 </style>
 
-<!--<script>-->
-
-<!--document.addEventListener('DOMContentLoaded', function() {-->
-
-<!--    var url = 'http://127.0.0.1:5001/GUI-is-still-open';-->
-<!--    fetch(url, { mode: 'no-cors'});-->
-<!--    setInterval(function(){ fetch(url, { mode: 'no-cors'});}, 500)();-->
-
-<!--});-->
-
-<!--</script>-->
+<!-- JavaScript Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
+        crossorigin="anonymous"></script>

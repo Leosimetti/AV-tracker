@@ -1,9 +1,10 @@
 from flask import Flask, render_template, Response, request
-from flaskwebgui import FlaskUI
+# from flaskwebgui import FlaskUI
 import time
 import os
 from db.timer import Timer
-
+from flask_socketio import SocketIO, emit
+import webbrowser
 
 # http://fm.1tvcrimea.ru:8000/stream.mp3
 # http://91.219.74.220:8000/Vanya-high.mp3
@@ -26,9 +27,14 @@ class WebWindow:
     def create_window(self):
         app = Flask(__name__)
 
+        app.config['SECRET_KEY'] = 'secret!'
+        socketio = SocketIO(app)
+
         # Feed it the flask app instance
-        ui = FlaskUI(app)
-        ui.on_exit = self.on_exit
+
+
+        # ui = FlaskUI(app)
+        # ui.on_exit = self.on_exit
 
         @app.route('/video_feed')
         def video_feed():
@@ -90,10 +96,11 @@ class WebWindow:
             Timer(new_threshold)
             return Response("Changed timer threshold")
 
-        @app.route("/exit")
+        @app.route("/exit", methods=['POST'])
         def leave():
             self.on_exit()
             # return Response("")
 
         # call the 'run' method
-        ui.run()
+        webbrowser.open('http://127.0.0.1:5000/ ', new=2)
+        socketio.run(app)
