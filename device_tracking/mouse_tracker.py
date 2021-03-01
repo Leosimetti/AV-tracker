@@ -2,6 +2,7 @@ import mouse
 from device_tracking import TrackingEvent, Tracker
 from db.signals_db import insert_data
 from datetime import datetime
+from db.timer import Timer
 
 
 class MouseTrackingEvent(TrackingEvent):
@@ -64,6 +65,7 @@ class MouseTracker(Tracker):
                         f" at {event.timestamp}!")
 
     def on_mouse_event(self, event):
+        Timer.reset_timer()
         timestamp = datetime.fromtimestamp(event.time)
         if isinstance(event, mouse.WheelEvent):
             event = MouseTrackingEvent(MouseTrackingEvent.WHEEL, timestamp)
