@@ -16,7 +16,6 @@ class Timer:
     def __init__(self, new_threshold):
         if new_threshold > 0:
             Timer.threshold = new_threshold
-            Timer.time_left = new_threshold
         else:
             raise ValueError("Threshold of timer should be positive number")
 
