@@ -5,10 +5,11 @@ import copy
 from datetime import datetime
 from queue import SimpleQueue
 from threading import Thread
+import pcv
 
 import cv2
 import imageio
-from pcv.vidIO import LockedCamera, SlowCamera
+from pcv.vidIO import LockedCamera, SlowCamera, Camera
 
 from db.video_data_db import insert_image
 from device_tracking import Tracker
@@ -154,7 +155,6 @@ class VideoProcessor:
 
 
 class PythonicVideoTracker(Tracker):
-    RECORDING = True
 
     @staticmethod
     def find_available_cams():
@@ -172,25 +172,41 @@ class PythonicVideoTracker(Tracker):
         self.models = models
         self.debug = debug
         self.processor = VideoProcessor(models=self.models, debug=self.debug)
-        self.cam = LockedCamera(self.source,
-                                preprocess=self.processor.preprocess
+        self.cam = SlowCamera(self.source,
+                                # preprocess=self.processor.preprocess
                                 )
         self.processor.set_cam(self.cam)
+        self.placeholder = imageio.mimread("device_tracking/200.gif")
+
 
     def change_cam(self, n):
-        self.cam.release()
-        self.source = n
-        self.cam = LockedCamera(self.source,
-                                preprocess=self.processor.preprocess
-                                )
-        self.processor.set_cam(self.cam)
+        self.cam.open(n)
+
+    def toggle(self):
+        if self.cam.isOpened():
+            self.cam.release()
+        else:
+            self.cam.open(self.source)
+
+    def change_camera(self):
+        self.cam.open(self.source)
 
     def track(self):
-
-        if self.RECORDING:
-            for status, frame in self.cam:
-                ret, buffer = cv2.imencode('.jpg', frame)
-                frame = buffer.tobytes()
-
+        gif_frame = 0
+        while True:
+            try:
+                _, frame = next(self.cam)
+                if frame is not None:
+                    frame = self.processor.preprocess(frame)
+                    status, buffer = cv2.imencode('.jpg', frame)
+                    if status:
+                        frame = buffer.tobytes()
+                        yield (b'--frame\r\n'
+                               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            except pcv.vidIO.OutOfFrames:
+                current_frame = cv2.resize(self.placeholder[gif_frame], (320, 240))
+                current_frame = cv2.imencode('.jpg', current_frame)[1].tobytes()
+                gif_frame = gif_frame + 1 if gif_frame + 1 < len(self.placeholder) else 0
+                time.sleep(0.02)
                 yield (b'--frame\r\n'
-                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                       b'Content-Type: image/jpeg\r\n\r\n' + current_frame + b'\r\n')

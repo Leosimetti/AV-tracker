@@ -27,7 +27,7 @@ class WebWindow:
 
     def create_window(self):
         app = Flask(__name__)
-        self.last_source = 0
+        # self.last_source = 0
 
         @app.route('/video_feed')
         def video_feed():
@@ -71,15 +71,17 @@ class WebWindow:
 
         @app.route('/video_disable', methods=['POST'])
         def video_disable():
-            self.last_source = self.video_tracker.source
-            self.video_tracker.change_cam(-1)
-            # self.video_tracker.RECORDING = False
+            # self.last_source = self.video_tracker.source
+            # self.video_tracker.change_cam(-1)
+            # # self.video_tracker.RECORDING = False
+            self.video_tracker.toggle()
             return Response("Video tracking disabled")
 
         @app.route('/video_enable', methods=['POST'])
         def video_enable():
-            self.video_tracker.change_cam(self.last_source)
+            # self.video_tracker.change_cam(self.last_source)
             # self.video_tracker.RECORDING = True
+            self.video_tracker.toggle()
             return Response("Video tracking enabled")
 
         @app.route('/km_state')

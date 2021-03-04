@@ -44,8 +44,8 @@
                 url: "/video_enable",
                 // data: {"source": value},
                 success: function (text) {
-                    document.getElementById('iframe').src = ""
-                    document.getElementById('iframe').contentWindow.location.reload(true);
+                    // document.getElementById('iframe').src = "/video_feed"
+                    // document.getElementById('iframe').contentWindow.location.reload(true);
                     mySwitch.disabled = false
                     // console.log("Done")
                 }
@@ -56,8 +56,8 @@
                 url: "/video_disable",
                 // data: {"source": value},
                 success: function (text) {
-                    document.getElementById('iframe').src = "/video_feed"
-                    document.getElementById('iframe').contentWindow.location.reload(true);
+                    // document.getElementById('iframe').src = ""
+                    // document.getElementById('iframe').contentWindow.location.reload(true);
                     mySwitch.disabled = false
                     // console.log("Done")
                 }
@@ -130,7 +130,7 @@
             url: "/change_cam",
             data: {"source": select.value},
             success: function () {
-                document.getElementById('iframe').contentWindow.location.reload(true);
+                // document.getElementById('iframe').contentWindow.location.reload(true);
                 select.disabled = false
             }
         });
@@ -205,10 +205,10 @@
 
 
     <div class="column">
-        <iframe src="{{ url_for('video_feed') }}" width="320px" height="240px" id="iframe">
-            COULD NOT ACCESS CAMERA
-        </iframe>
-        <!--        <img src="{{ url_for('video_feed') }}" width="100%" id="video">-->
+<!--        <iframe src="{{ url_for('video_feed') }}" width="320px" height="240px" id="iframe">-->
+<!--            COULD NOT ACCESS CAMERA-->
+<!--        </iframe>-->
+                <img src="{{ url_for('video_feed') }}" width="100%" id="video">
 
         <h2>
             Input state: <span id="activity-state">Active</span>
