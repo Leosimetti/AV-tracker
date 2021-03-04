@@ -6,7 +6,6 @@ from datetime import datetime
 from queue import SimpleQueue
 from threading import Thread
 import pcv
-import simplejpeg
 
 import cv2
 import imageio
