@@ -156,11 +156,30 @@ class VideoProcessor:
 class PythonicVideoTracker(Tracker):
     RECORDING = True
 
+    @staticmethod
+    def find_available_cams():
+        arr = []
+        for i in range(0, 10):
+            cap = cv2.VideoCapture(i)
+            if cap.read()[0]:
+                arr.append(i)
+            cap.release()
+        return arr
+
     def __init__(self, source, debug, models):
+        self.available_cams = self.find_available_cams()
         self.source = source
         self.models = models
         self.debug = debug
         self.processor = VideoProcessor(models=self.models, debug=self.debug)
+        self.cam = LockedCamera(self.source,
+                                preprocess=self.processor.preprocess
+                                )
+        self.processor.set_cam(self.cam)
+
+    def change_cam(self, n):
+        self.cam.release()
+        self.source = n
         self.cam = LockedCamera(self.source,
                                 preprocess=self.processor.preprocess
                                 )

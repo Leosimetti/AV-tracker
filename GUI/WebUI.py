@@ -1,9 +1,12 @@
+import json
+
 from flask import Flask, render_template, Response, request
 # from flaskwebgui import FlaskUI
 import time
 import os
 from db.timer import Timer
 import webbrowser
+
 
 # http://fm.1tvcrimea.ru:8000/stream.mp3
 # http://91.219.74.220:8000/Vanya-high.mp3
@@ -20,11 +23,11 @@ class WebWindow:
         keyboard.unhook_all()
         mouse.unhook_all()
 
-        self.video_tracker.RECORDING = False
         os._exit(0)
 
     def create_window(self):
         app = Flask(__name__)
+        self.last_source = 0
 
         @app.route('/video_feed')
         def video_feed():
@@ -60,14 +63,23 @@ class WebWindow:
             tracker.track()
             return Response("Mouse tracking enabled")
 
-        @app.route('/video_disable')
+        @app.route('/available_cameras')
+        def available_cameras():
+            arr = self.video_tracker.available_cams
+            arr = json.dumps(arr)
+            return Response(arr)
+
+        @app.route('/video_disable', methods=['POST'])
         def video_disable():
-            self.video_tracker.RECORDING = False
+            self.last_source = self.video_tracker.source
+            self.video_tracker.change_cam(-1)
+            # self.video_tracker.RECORDING = False
             return Response("Video tracking disabled")
 
-        @app.route('/video_enable')
+        @app.route('/video_enable', methods=['POST'])
         def video_enable():
-            self.video_tracker.RECORDING = True
+            self.video_tracker.change_cam(self.last_source)
+            # self.video_tracker.RECORDING = True
             return Response("Video tracking enabled")
 
         @app.route('/km_state')
@@ -77,8 +89,17 @@ class WebWindow:
 
         @app.route('/change_fps', methods=['POST'])
         def change_fps():
+            print(int(request.values['fps']))
             self.video_tracker.processor.FPS = int(request.values['fps'])
             return Response("Changed FPS")
+
+        @app.route('/change_cam', methods=['POST'])
+        def change_cam():
+            cam = int(request.values['source'])
+            if self.video_tracker.source != cam:
+                self.video_tracker.change_cam(cam)
+            # print("Successfully changed")
+            return Response("Changed Camera")
 
         @app.route('/change_threshold', methods=['POST'])
         def change_threshold():

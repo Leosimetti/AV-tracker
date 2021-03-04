@@ -146,3 +146,4 @@ dmypy.json
 *.sqlite
 data2.zip
 db/signals.sqlite-journal
+data3.zip

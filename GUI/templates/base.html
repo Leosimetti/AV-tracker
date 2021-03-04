@@ -5,6 +5,20 @@
 
 <script type=text/javascript>
 
+    $.getJSON('/available_cameras', function (data) {
+        console.log(data)
+        select = document.getElementById("mySelect")
+        // data = JSON.parse(data)
+
+        for (const datum of data) {
+            option = document.createElement('option');
+            option.text = `Camera ${datum}`
+            option.value = datum;
+            select.add(option);
+        }
+
+    });
+
     $(function () {
         $('#exit').on('click', function (e) {
             e.preventDefault()
@@ -22,21 +36,34 @@
 
 
     function video_toggled(mySwitch) {
+        // document.getElementById('iframe').contentWindow.location.reload(true);
+        mySwitch.disabled = true
         if (mySwitch.checked) {
-            $('img').attr('src', "/video_feed")
-            $.getJSON('/video_enable',
-                function (data) {
-                    //do nothing
-                });
+            $.ajax({
+                type: "POST",
+                url: "/video_enable",
+                // data: {"source": value},
+                success: function (text) {
+                    document.getElementById('iframe').src = ""
+                    document.getElementById('iframe').contentWindow.location.reload(true);
+                    mySwitch.disabled = false
+                    // console.log("Done")
+                }
+            });
         } else {
-            $('img').attr('src', "https://static.toiimg.com/photo/msid-67586673/67586673.jpg")
-            $('img').attr('width', "320")
-            $('img').attr('height', "240")
-            $.getJSON('/video_disable',
-                function (data) {
-                });
+            $.ajax({
+                type: "POST",
+                url: "/video_disable",
+                // data: {"source": value},
+                success: function (text) {
+                    document.getElementById('iframe').src = "/video_feed"
+                    document.getElementById('iframe').contentWindow.location.reload(true);
+                    mySwitch.disabled = false
+                    // console.log("Done")
+                }
+            });
         }
-
+        // setTimeout(mySwitch.disabled = false, 4000);
         return false
 
     }
@@ -84,7 +111,6 @@
             url: "/km_state",
             dataType: "text",
             success: function (data) {
-                console.log(data)
                 $('#activity-state').text(data);
             },
         });
@@ -93,6 +119,22 @@
 
     function change_fps(value) {
         $.post("/change_fps", {"fps": value});
+        return false
+    }
+
+    function change_cam(select) {
+        // $.post("/change_cam", {"source": value});
+        select.disabled = true
+        $.ajax({
+            type: "POST",
+            url: "/change_cam",
+            data: {"source": select.value},
+            success: function () {
+                document.getElementById('iframe').contentWindow.location.reload(true);
+                select.disabled = false
+            }
+        });
+        // document.getElementById('iframe').contentWindow.location.reload(true);
         return false
     }
 
@@ -127,19 +169,19 @@
         <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" id="mouseSwitch" checked
                    onclick="mouse_toggled(this)">
-            <label class="form-check-label" for="flexSwitchCheckChecked">Mouse tracking</label>
+            <label class="form-check-label" for="mouseSwitch">Mouse tracking</label>
         </div>
 
         <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" id="keyboardSwitch" checked
                    onclick="keyboard_toggled(this)">
-            <label class="form-check-label" for="flexSwitchCheckChecked">Keyboard tracking</label>
+            <label class="form-check-label" for="keyboardSwitch">Keyboard tracking</label>
         </div>
 
         <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked
+            <input class="form-check-input" type="checkbox" id="videoSwitch" checked
                    onclick="video_toggled(this)">
-            <label class="form-check-label" for="flexSwitchCheckChecked">Video tracking</label>
+            <label class="form-check-label" for="videoSwitch">Video tracking</label>
         </div>
 
 
@@ -163,12 +205,18 @@
 
 
     <div class="column">
-        <img src="{{ url_for('video_feed') }}" width="100%" id="video">
-
+        <iframe src="{{ url_for('video_feed') }}" width="320px" height="240px" id="iframe">
+            COULD NOT ACCESS CAMERA
+        </iframe>
+        <!--        <img src="{{ url_for('video_feed') }}" width="100%" id="video">-->
 
         <h2>
             Input state: <span id="activity-state">Active</span>
         </h2>
+
+        <select class="form-select" id="mySelect" onchange="change_cam(this)">
+            <option selected disabled>Change your camera</option>
+        </select>
 
 
     </div>
@@ -194,9 +242,9 @@
     body {
         font-size: 200%;
         display: flex;
-        background: linear-gradient(217deg, rgba(255,0,0,.8), rgba(255,0,0,0) 70.71%),
-            linear-gradient(127deg, rgba(0,255,0,.8), rgba(0,255,0,0) 70.71%),
-            linear-gradient(336deg, rgba(0,0,255,.8), rgba(0,0,255,0) 70.71%);
+        background: linear-gradient(217deg, rgba(255, 0, 0, .8), rgba(255, 0, 0, 0) 70.71%),
+        linear-gradient(127deg, rgba(0, 255, 0, .8), rgba(0, 255, 0, 0) 70.71%),
+        linear-gradient(336deg, rgba(0, 0, 255, .8), rgba(0, 0, 255, 0) 70.71%);
         /*background-color: #80bc00;*/
     }
 
@@ -329,8 +377,14 @@
         background: #367ebd;
     }
 
-    output{
+    output {
         width: 30px;
+    }
+
+    #iframe {
+        overflow-x: hidden;
+    / / horizontal overflow-y: hidden;
+    / / vertical
     }
 
 </style>
