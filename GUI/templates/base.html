@@ -5,19 +5,29 @@
 
 <script type=text/javascript>
 
-    $.getJSON('/available_cameras', function (data) {
-        console.log(data)
-        select = document.getElementById("mySelect")
-        // data = JSON.parse(data)
 
-        for (const datum of data) {
-            option = document.createElement('option');
-            option.text = `Camera ${datum}`
-            option.value = datum;
-            select.add(option);
-        }
+    function update_cameras() {
+        $.getJSON('/available_cameras', function (data) {
 
-    });
+            select = document.getElementById("mySelect")
+            savedValue = select.value;
+
+            $("#mySelect").empty();
+
+
+            for (const datum of data) {
+                option = document.createElement('option');
+                option.text = `Camera ${datum}`
+                option.value = datum;
+                select.add(option);
+            }
+
+            select.value = savedValue;
+
+
+        });
+    }
+
 
     $(function () {
         $('#exit').on('click', function (e) {
@@ -116,6 +126,9 @@
         });
     }, 1000);
 
+    // setInterval(() => {
+    //     update_cameras()
+    // }, 10000)
 
     function change_fps(value) {
         $.post("/change_fps", {"fps": value});
@@ -130,7 +143,6 @@
             url: "/change_cam",
             data: {"source": select.value},
             success: function () {
-                // document.getElementById('iframe').contentWindow.location.reload(true);
                 select.disabled = false
             }
         });
@@ -144,6 +156,8 @@
         return false
     }
 
+
+    update_cameras();
 
 </script>
 
@@ -205,17 +219,17 @@
 
 
     <div class="column">
-<!--        <iframe src="{{ url_for('video_feed') }}" width="320px" height="240px" id="iframe">-->
-<!--            COULD NOT ACCESS CAMERA-->
-<!--        </iframe>-->
-                <img src="{{ url_for('video_feed') }}" width="100%" id="video">
+        <!--        <iframe src="{{ url_for('video_feed') }}" width="320px" height="240px" id="iframe">-->
+        <!--            COULD NOT ACCESS CAMERA-->
+        <!--        </iframe>-->
+        <img src="{{ url_for('video_feed') }}" width="100%" id="video">
 
         <h2>
             Input state: <span id="activity-state">Active</span>
         </h2>
 
         <select class="form-select" id="mySelect" onchange="change_cam(this)">
-            <option selected disabled>Change your camera</option>
+            <option selected disabled value="0">Camera 0</option>
         </select>
 
 

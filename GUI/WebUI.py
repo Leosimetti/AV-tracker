@@ -65,22 +65,18 @@ class WebWindow:
 
         @app.route('/available_cameras')
         def available_cameras():
-            arr = self.video_tracker.available_cams
+            current = self.video_tracker.source
+            arr = self.video_tracker.find_available_cams(current)
             arr = json.dumps(arr)
             return Response(arr)
 
         @app.route('/video_disable', methods=['POST'])
         def video_disable():
-            # self.last_source = self.video_tracker.source
-            # self.video_tracker.change_cam(-1)
-            # # self.video_tracker.RECORDING = False
             self.video_tracker.toggle()
             return Response("Video tracking disabled")
 
         @app.route('/video_enable', methods=['POST'])
         def video_enable():
-            # self.video_tracker.change_cam(self.last_source)
-            # self.video_tracker.RECORDING = True
             self.video_tracker.toggle()
             return Response("Video tracking enabled")
 
@@ -100,7 +96,6 @@ class WebWindow:
             cam = int(request.values['source'])
             if self.video_tracker.source != cam:
                 self.video_tracker.change_cam(cam)
-            # print("Successfully changed")
             return Response("Changed Camera")
 
         @app.route('/change_threshold', methods=['POST'])

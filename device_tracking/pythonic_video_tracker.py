@@ -157,17 +157,20 @@ class VideoProcessor:
 class PythonicVideoTracker(Tracker):
 
     @staticmethod
-    def find_available_cams():
+    def find_available_cams(current):
         arr = []
         for i in range(0, 10):
-            cap = cv2.VideoCapture(i)
-            if cap.read()[0]:
-                arr.append(i)
-            cap.release()
+            if i != current:
+                cap = cv2.VideoCapture(i)
+                if cap.read()[0]:
+                    arr.append(i)
+                cap.release()
+            else:
+                arr.append(current)
         return arr
 
     def __init__(self, source, debug, models):
-        self.available_cams = self.find_available_cams()
+        # self.available_cams = self.find_available_cams()
         self.source = source
         self.models = models
         self.debug = debug
