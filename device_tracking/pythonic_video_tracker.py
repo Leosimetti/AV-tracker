@@ -6,6 +6,7 @@ from datetime import datetime
 from queue import SimpleQueue
 from threading import Thread
 import pcv
+import simplejpeg
 
 import cv2
 import imageio
@@ -13,6 +14,25 @@ from pcv.vidIO import LockedCamera, SlowCamera, Camera
 
 from db.video_data_db import insert_image
 from device_tracking import Tracker
+
+placeholder = imageio.mimread("device_tracking/200.gif")
+gif_frame = 0
+
+
+def stream_placeholder():
+    global placeholder
+    global gif_frame
+    while True:
+        current_frame = cv2.resize(placeholder[gif_frame], (320, 240))
+        current_frame = cv2.imencode('.jpg', current_frame)[1].tobytes()
+        gif_frame = gif_frame + 1 \
+            if gif_frame + 1 < len(placeholder) \
+            else 0
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + current_frame + b'\r\n')
+
+
+placeholder_stream = stream_placeholder()
 
 
 class VideoProcessor:
@@ -172,12 +192,10 @@ class PythonicVideoTracker(Tracker):
         self.models = models
         self.debug = debug
         self.processor = VideoProcessor(models=self.models, debug=self.debug)
-        self.cam = SlowCamera(self.source,
-                                # preprocess=self.processor.preprocess
+        self.cam = LockedCamera(self.source,
+                                preprocess=self.processor.preprocess
                                 )
         self.processor.set_cam(self.cam)
-        self.placeholder = imageio.mimread("device_tracking/200.gif")
-
 
     def change_cam(self, n):
         self.cam.open(n)
@@ -191,22 +209,33 @@ class PythonicVideoTracker(Tracker):
     def change_camera(self):
         self.cam.open(self.source)
 
+    def obtain_frame(self):
+        import queue
+
+        def do_task(queue, self):
+            try:
+                queue.put(next(self.cam))
+            except pcv.vidIO.OutOfFrames:
+                pass
+
+        q = queue.Queue()
+        grab_frame = Thread(target=do_task, args=(q, self), daemon=True)
+        grab_frame.start()
+        try:
+            return q.get(block=True, timeout=0.85)
+        except queue.Empty:
+            raise pcv.vidIO.OutOfFrames
+
     def track(self):
-        gif_frame = 0
         while True:
             try:
-                _, frame = next(self.cam)
+                _, frame = self.obtain_frame()
                 if frame is not None:
-                    frame = self.processor.preprocess(frame)
+                    # frame = self.processor.preprocess(frame)
                     status, buffer = cv2.imencode('.jpg', frame)
                     if status:
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
                                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             except pcv.vidIO.OutOfFrames:
-                current_frame = cv2.resize(self.placeholder[gif_frame], (320, 240))
-                current_frame = cv2.imencode('.jpg', current_frame)[1].tobytes()
-                gif_frame = gif_frame + 1 if gif_frame + 1 < len(self.placeholder) else 0
-                time.sleep(0.02)
-                yield (b'--frame\r\n'
-                       b'Content-Type: image/jpeg\r\n\r\n' + current_frame + b'\r\n')
+                yield next(placeholder_stream)
