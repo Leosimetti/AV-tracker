@@ -73,7 +73,7 @@ class WebWindow:
         def video_disable():
             # self.last_source = self.video_tracker.source
             # self.video_tracker.change_cam(-1)
-            # # self.video_tracker.RECORDING = False
+            # self.video_tracker.RECORDING = False
             self.video_tracker.toggle()
             return Response("Video tracking disabled")
 
