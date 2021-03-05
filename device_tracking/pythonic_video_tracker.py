@@ -234,6 +234,7 @@ class PythonicVideoTracker(Tracker):
 
     def track(self):
         while True:
+            print("zhopa")
             try:
                 _, frame = self.obtain_frame()
                 if frame is not None:

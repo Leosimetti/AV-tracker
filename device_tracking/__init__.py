@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from db.timer import Timer
 import queue
+import multiprocessing
 import threading
 
 
@@ -28,18 +29,6 @@ class Tracker:
         self.PROCESS_EVENTS = True
         self.ENABLED = True
         self.debug = debug
-        self.event_queue = queue.Queue()
-        self.event_processor = threading.Thread(
-            target=self.process_events,
-            daemon=True
-        )
-        self.event_processor.start()
-
-    def process_events(self):
-        while self.PROCESS_EVENTS:
-            # print(self.event_queue.qsize())
-            event = self.event_queue.get()
-            event.process()
 
     def debug_info(self, msg):
         if hasattr(self, "debug"):

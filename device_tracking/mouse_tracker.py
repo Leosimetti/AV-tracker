@@ -3,6 +3,79 @@ from device_tracking import TrackingEvent, Tracker
 from db.signals_db import insert_data
 from datetime import datetime
 from device_tracking import togglable
+import multiprocessing
+import threading
+from db.timer import Timer
+from functools import partial
+
+event_queue = multiprocessing.Queue()
+disable_event = multiprocessing.Event()
+PROCESS_EVENTS = True
+
+
+def process_events():
+    while PROCESS_EVENTS:
+        # print(self.event_queue.qsize())
+        event = event_queue.get()
+        event.process()
+
+
+processing_thread = threading.Thread(
+    target=process_events,
+    daemon=True
+)
+processing_thread.start()
+
+
+def start_listener(flag, event_queue):
+    move_count = 0
+    scroll_count = 0
+
+    def on_move(flag, event_queue, x, y):
+        if flag.is_set():
+            import sys
+            sys.exit(0)
+        else:
+            Timer.reset_timer()
+            nonlocal move_count
+            move_count += 1
+            if move_count % 200 == 0:
+                event = MouseTrackingEvent(MouseTrackingEvent.MOVE, timestamp=datetime.now())
+                print(event)
+                move_count = 0
+                event_queue.put(event)
+
+    def on_click(flag, event_queue, x, y, button, pressed):
+        if flag.is_set():
+            import sys
+            sys.exit(0)
+        else:
+            Timer.reset_timer()
+            if pressed:
+                event = MouseTrackingEvent(MouseTrackingEvent.CLICK, timestamp=datetime.now())
+                print(event)
+                event_queue.put(event)
+
+    def on_scroll(flag, event_queue, x, y, dx, dy):
+        if flag.is_set():
+            import sys
+            sys.exit(0)
+        else:
+            Timer.reset_timer()
+            nonlocal scroll_count
+            scroll_count += 1
+            if scroll_count % 10 == 0:
+                event = MouseTrackingEvent(MouseTrackingEvent.WHEEL, timestamp=datetime.now())
+                print(event)
+                event_queue.put(event)
+                scroll_count = 0
+
+    with mouse.Listener(
+            on_click=partial(on_click, flag, event_queue),
+            on_scroll=partial(on_scroll, flag, event_queue),
+            on_move=partial(on_move, flag, event_queue)
+    ) as listen:
+        listen.join()
 
 
 class MouseTrackingEvent(TrackingEvent):
@@ -50,10 +123,10 @@ class MouseTracker(Tracker):
         self.move_count = 0
         self.scroll_count = 0
         self.previous_event = None
-        self.listener = mouse.Listener(
-            on_move=self.on_move,
-            on_click=self.on_click,
-            on_scroll=self.on_scroll,
+        self.listener = multiprocessing.Process(
+            target=start_listener,
+            args=(disable_event, event_queue,),
+            daemon=True
         )
 
     def click_msg(self, event: MouseTrackingEvent):
@@ -67,44 +140,20 @@ class MouseTracker(Tracker):
         self.debug_info(f"{event} has been registered {self.scroll_count} times"
                         f" at {event.timestamp}!")
 
-    @togglable
-    def on_move(self, x, y):
-        self.move_count += 1
-        if self.move_count % 200 == 0:
-            event = MouseTrackingEvent(MouseTrackingEvent.MOVE, timestamp=datetime.now())
-            self.move_msg(event)
-            self.move_count = 0
-            self.event_queue.put(event)
-
-    @togglable
-    def on_click(self, x, y, button, pressed):
-        if pressed:
-            event = MouseTrackingEvent(MouseTrackingEvent.CLICK, timestamp=datetime.now())
-            self.click_msg(event)
-            self.event_queue.put(event)
-
-    @togglable
-    def on_scroll(self, x, y, dx, dy):
-        self.scroll_count += 1
-        if self.scroll_count % 10 == 0:
-            event = MouseTrackingEvent(MouseTrackingEvent.WHEEL, timestamp=datetime.now())
-            self.wheel_msg(event)
-            self.event_queue.put(event)
-            self.scroll_count = 0
-
     def track(self):
         self.listener.start()
 
     def disable(self):
-        self.listener.stop()
+        disable_event.set()
 
     def enable(self):
-        self.listener = mouse.Listener(
-            on_move=self.on_move,
-            on_click=self.on_click,
-            on_scroll=self.on_scroll,
+        self.listener = multiprocessing.Process(
+            target=start_listener,
+            args=(disable_event, event_queue,),
+            daemon=True
         )
-        self.track()
+        disable_event.clear()
+        self.listener.start()
 
 
 if __name__ == "__main__":
