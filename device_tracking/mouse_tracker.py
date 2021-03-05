@@ -96,10 +96,15 @@ class MouseTracker(Tracker):
         self.listener.start()
 
     def disable(self):
-        self.ENABLED = False
+        self.listener.stop()
 
     def enable(self):
-        self.ENABLED = True
+        self.listener = mouse.Listener(
+            on_move=self.on_move,
+            on_click=self.on_click,
+            on_scroll=self.on_scroll,
+        )
+        self.track()
 
 
 if __name__ == "__main__":

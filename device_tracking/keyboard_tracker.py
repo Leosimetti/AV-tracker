@@ -21,10 +21,13 @@ class KeyboardTrackingEvent(TrackingEvent):
 
 class KeyboardTracker(Tracker):
     def disable(self):
-        self.ENABLED = False
+        self.listener.stop()
 
     def enable(self):
-        self.ENABLED = True
+        self.listener = keyboard.Listener(
+            on_press=self.on_press
+        )
+        self.track()
 
     def __init__(self, debug):
         super(KeyboardTracker, self).__init__(debug)
