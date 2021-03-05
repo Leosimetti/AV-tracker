@@ -1,7 +1,8 @@
-import keyboard
+from pynput import keyboard
 from device_tracking import TrackingEvent, Tracker
 from db.signals_db import insert_data
 from datetime import datetime
+from device_tracking import togglable
 
 
 class KeyboardTrackingEvent(TrackingEvent):
@@ -19,20 +20,31 @@ class KeyboardTrackingEvent(TrackingEvent):
 
 
 class KeyboardTracker(Tracker):
+    def disable(self):
+        self.ENABLED = False
+
+    def enable(self):
+        self.ENABLED = True
+
     def __init__(self, debug):
         self.debug = debug
+        self.listener = keyboard.Listener(
+            on_press=self.on_press
+        )
+        self.ENABLED = True
 
     def track(self):
-        keyboard.on_press(self.on_press)
+        self.listener.start()
 
-    def on_press(self, event):
-        key = str(event.name)
-        if len(key) == 1 or key == "space":
+    @togglable
+    def on_press(self, key):
+        try:
+            char = key.char
             category = KeyboardTrackingEvent.TYPING
-        else:
+        except AttributeError:
             category = KeyboardTrackingEvent.NON_TYPING
 
-        timestamp = datetime.utcfromtimestamp(event.time)
+        timestamp = datetime.now()
         tracking_event = KeyboardTrackingEvent(category, timestamp)
         tracking_event.process()
         self.debug_info(f"{timestamp} {category}")

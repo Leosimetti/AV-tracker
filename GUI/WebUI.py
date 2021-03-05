@@ -13,21 +13,16 @@ import webbrowser
 
 
 class WebWindow:
-    def __init__(self, video_tracker):
+    def __init__(self, video_tracker, mouse_tracker, kb_tracker):
         self.video_tracker = video_tracker
+        self.mouse_tracker = mouse_tracker
+        self.kb_tracker = kb_tracker
 
     def on_exit(self):
-        import keyboard
-        import mouse
-
-        keyboard.unhook_all()
-        mouse.unhook_all()
-
         os._exit(0)
 
     def create_window(self):
         app = Flask(__name__)
-        # self.last_source = 0
 
         @app.route('/video_feed')
         def video_feed():
@@ -39,28 +34,22 @@ class WebWindow:
 
         @app.route('/keyboard_disable')
         def keyboard_disable():
-            import keyboard
-            keyboard.unhook_all()
+            self.kb_tracker.disable()
             return Response("Keyboard tracking disabled")
 
         @app.route('/keyboard_enable')
         def keyboard_enable():
-            from device_tracking.keyboard_tracker import KeyboardTracker
-            tracker = KeyboardTracker(True)
-            tracker.track()
+            self.kb_tracker.enable()
             return Response("Keyboard tracking enabled")
 
         @app.route('/mouse_disable')
         def mouse_disable():
-            import mouse
-            mouse.unhook_all()
+            self.mouse_tracker.disable()
             return Response("Mouse tracking disabled")
 
         @app.route('/mouse_enable')
         def mouse_enable():
-            from device_tracking.mouse_tracker import MouseTracker
-            tracker = MouseTracker(True)
-            tracker.track()
+            self.mouse_tracker.enable()
             return Response("Mouse tracking enabled")
 
         @app.route('/available_cameras')
@@ -72,12 +61,12 @@ class WebWindow:
 
         @app.route('/video_disable', methods=['POST'])
         def video_disable():
-            self.video_tracker.toggle()
+            self.video_tracker.disable()
             return Response("Video tracking disabled")
 
         @app.route('/video_enable', methods=['POST'])
         def video_enable():
-            self.video_tracker.toggle()
+            self.video_tracker.enable()
             return Response("Video tracking enabled")
 
         @app.route('/km_state')

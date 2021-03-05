@@ -176,6 +176,14 @@ class VideoProcessor:
 
 class PythonicVideoTracker(Tracker):
 
+    def disable(self):
+        if self.cam.isOpened():
+            self.cam.release()
+
+    def enable(self):
+        if not self.cam.isOpened():
+            self.cam.open(self.source)
+
     @staticmethod
     def find_available_cams(current):
         arr = []
@@ -203,12 +211,6 @@ class PythonicVideoTracker(Tracker):
     def change_cam(self, n):
         self.cam.open(n)
 
-    def toggle(self):
-        if self.cam.isOpened():
-            self.cam.release()
-        else:
-            self.cam.open(self.source)
-
     def change_camera(self):
         self.cam.open(self.source)
 
@@ -225,7 +227,7 @@ class PythonicVideoTracker(Tracker):
         grab_frame = Thread(target=do_task, args=(q, self), daemon=True)
         grab_frame.start()
         try:
-            return q.get(block=True, timeout=0.85)
+            return q.get(block=True, timeout=0.5)
         except queue.Empty:
             raise pcv.vidIO.OutOfFrames
 
