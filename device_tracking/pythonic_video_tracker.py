@@ -228,7 +228,7 @@ class PythonicVideoTracker(Tracker):
         grab_frame = Thread(target=do_task, args=(q, self), daemon=True)
         grab_frame.start()
         try:
-            return q.get(block=True, timeout=0.5)
+            return q.get(block=True, timeout=1)
         except queue.Empty:
             raise pcv.vidIO.OutOfFrames
 
