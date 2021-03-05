@@ -40,10 +40,15 @@ if __name__ == "__main__":
     timer.start()
 
     # Video tracker
-    video_tracker = PythonicVideoTracker(source=0,
-                                         debug=DEBUG,
-                                         models=[DNNModel(DEBUG), KerasPBModel(DEBUG)]
-                                         )
+    video_tracker = PythonicVideoTracker(
+        source=0,
+        debug=DEBUG,
+        models=[DNNModel(DEBUG), KerasPBModel(DEBUG)]
+    )
 
-    w = WebWindow(video_tracker)
+    w = WebWindow(
+        video_tracker=video_tracker,
+        mouse_tracker=mouse_tracker,
+        kb_tracker=kb_tracker
+    )
     w.create_window()

@@ -1,8 +1,8 @@
-import mouse
+from pynput import mouse
 from device_tracking import TrackingEvent, Tracker
 from db.signals_db import insert_data
 from datetime import datetime
-from db.timer import Timer
+from device_tracking import togglable
 
 
 class MouseTrackingEvent(TrackingEvent):
@@ -46,12 +46,15 @@ class MouseTrackingEvent(TrackingEvent):
 class MouseTracker(Tracker):
 
     def __init__(self, debug):
-        if debug:
-            self.event_dict = {}
+        super(MouseTracker, self).__init__(debug)
         self.move_count = 0
         self.scroll_count = 0
-        self.debug = debug
         self.previous_event = None
+        self.listener = mouse.Listener(
+            on_move=self.on_move,
+            on_click=self.on_click,
+            on_scroll=self.on_scroll,
+        )
 
     def click_msg(self, event: MouseTrackingEvent):
         self.debug_info(f"Mouse was clicked at {event.timestamp}!")
@@ -64,53 +67,45 @@ class MouseTracker(Tracker):
         self.debug_info(f"{event} has been registered {self.scroll_count} times"
                         f" at {event.timestamp}!")
 
-    def on_mouse_event(self, event):
-        Timer.reset_timer()
-        timestamp = datetime.fromtimestamp(event.time)
-        if isinstance(event, mouse.WheelEvent):
-            event = MouseTrackingEvent(MouseTrackingEvent.WHEEL, timestamp)
-        elif isinstance(event, mouse.MoveEvent):
-            event = MouseTrackingEvent(MouseTrackingEvent.MOVE, timestamp)
-        else:
-            event = MouseTrackingEvent(MouseTrackingEvent.CLICK, timestamp)
+    @togglable
+    def on_move(self, x, y):
+        self.move_count += 1
+        if self.move_count % 200 == 0:
+            event = MouseTrackingEvent(MouseTrackingEvent.MOVE, timestamp=datetime.now())
+            self.move_msg(event)
+            self.move_count = 0
+            self.event_queue.put(event)
 
-        if self.previous_event is None:
-            self.previous_event = event
-        elif self.previous_event != event:
-
-            if self.previous_event.is_move():
-                self.move_msg(self.previous_event)
-                self.move_count = 0
-                self.previous_event.process()
-                if event.is_wheel():
-                    self.scroll_count = 1
-                else:
-                    self.click_msg(event)
-                    event.process()
-
-            elif self.previous_event.is_wheel():
-                self.wheel_msg(self.previous_event)
-                self.scroll_count = 0
-                self.previous_event.process()
-                if event.is_move():
-                    self.move_count = 1
-                else:
-                    self.click_msg(event)
-                    event.process()
-            elif self.previous_event.is_click():
-                if event.is_move():
-                    self.move_count += 1
-                else:
-                    self.scroll_count += 1
-
-        elif event.is_click():
+    @togglable
+    def on_click(self, x, y, button, pressed):
+        if pressed:
+            event = MouseTrackingEvent(MouseTrackingEvent.CLICK, timestamp=datetime.now())
             self.click_msg(event)
-        elif event.is_move():
-            self.move_count += 1
-        else:
-            self.scroll_count += 1
+            self.event_queue.put(event)
 
-        self.previous_event = event
+    @togglable
+    def on_scroll(self, x, y, dx, dy):
+        self.scroll_count += 1
+        if self.scroll_count % 10 == 0:
+            event = MouseTrackingEvent(MouseTrackingEvent.WHEEL, timestamp=datetime.now())
+            self.wheel_msg(event)
+            self.event_queue.put(event)
+            self.scroll_count = 0
 
     def track(self):
-        mouse.hook(self.on_mouse_event)
+        self.listener.start()
+
+    def disable(self):
+        self.listener.stop()
+
+    def enable(self):
+        self.listener = mouse.Listener(
+            on_move=self.on_move,
+            on_click=self.on_click,
+            on_scroll=self.on_scroll,
+        )
+        self.track()
+
+
+if __name__ == "__main__":
+    t = MouseTracker(debug=True)

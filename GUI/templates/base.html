@@ -29,20 +29,20 @@
     }
 
 
-    $(function () {
-        $('#exit').on('click', function (e) {
-            e.preventDefault()
-            $.getJSON('/exit',
-                function (data) {
-                    //do nothing
-                });
-            setTimeout(() => {
-                window.location.replace("javascript:window.open('','_self').close();");
-            }, 500);
-
-            return false;
-        });
-    });
+    // $(function () {
+    //     $('#exit').on('click', function (e) {
+    //         e.preventDefault()
+    //         $.getJSON('/exit',
+    //             function (data) {
+    //                 //do nothing
+    //             });
+    //         setTimeout(() => {
+    //             window.location.replace("javascript:window.open('','_self').close();");
+    //         }, 500);
+    //
+    //         return false;
+    //     });
+    // });
 
 
     function video_toggled(mySwitch) {
@@ -112,9 +112,9 @@
         return false
     }
 
-    window.addEventListener('beforeunload', function () {
-        navigator.sendBeacon('/exit')
-    });
+    // window.addEventListener('beforeunload', function () {
+    //     navigator.sendBeacon('/exit')
+    // });
 
     setInterval(() => {
         $.ajax({
@@ -156,6 +156,15 @@
         return false
     }
 
+    function exit() {
+        $.ajax({
+            type: "POST",
+            url: "/exit",
+        });
+        setTimeout(() => {
+            window.location.replace("javascript:window.open('','_self').close();");
+        }, 500);
+    }
 
     update_cameras();
 
@@ -210,11 +219,11 @@
         </p>
 
         <div class="exit">
-            <form action="/exit" method="post">
-                <button name="exitBtn" class="btn btn-primary" type="submit" id="exit">Exit</button>
-            </form>
-
+            <!--            <form action="/exit" method="post">-->
+            <button name="exitBtn" class="btn btn-primary" id="exit" onclick="exit()">Exit</button>
+            <!--            </form>-->
         </div>
+        <br>
     </div>
 
 
