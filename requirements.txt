@@ -1,14 +1,10 @@
 opencv_python==4.5.1.48
-tensorflow==2.4.1
-keyboard==0.13.5
 imageio==2.9.0
 numpy==1.19.5
 Flask==1.1.2
-mouse==0.7.1
 pytest==6.2.2
 pythonic_cv==1.1.8
 flaskwebgui==0.1.13
 pcv==0.0.2
 Pillow==8.1.0
 pynput==1.7.3
-flask-socketio==5.0.1
