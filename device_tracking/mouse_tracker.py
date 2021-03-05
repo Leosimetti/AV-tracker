@@ -74,14 +74,14 @@ class MouseTracker(Tracker):
             event = MouseTrackingEvent(MouseTrackingEvent.MOVE, timestamp=datetime.now())
             self.move_msg(event)
             self.move_count = 0
-            event.process()
+            self.event_queue.put(event)
 
     @togglable
     def on_click(self, x, y, button, pressed):
         if pressed:
             event = MouseTrackingEvent(MouseTrackingEvent.CLICK, timestamp=datetime.now())
             self.click_msg(event)
-            event.process()
+            self.event_queue.put(event)
 
     @togglable
     def on_scroll(self, x, y, dx, dy):
@@ -89,7 +89,7 @@ class MouseTracker(Tracker):
         if self.scroll_count % 10 == 0:
             event = MouseTrackingEvent(MouseTrackingEvent.WHEEL, timestamp=datetime.now())
             self.wheel_msg(event)
-            event.process()
+            self.event_queue.put(event)
             self.scroll_count = 0
 
     def track(self):

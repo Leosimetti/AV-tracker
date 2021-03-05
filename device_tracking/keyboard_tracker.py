@@ -48,5 +48,5 @@ class KeyboardTracker(Tracker):
 
         timestamp = datetime.now()
         tracking_event = KeyboardTrackingEvent(category, timestamp)
-        tracking_event.process()
+        self.event_queue.put(tracking_event)
         self.debug_info(f"{timestamp} {category}")
