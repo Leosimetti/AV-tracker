@@ -27,11 +27,10 @@ class KeyboardTracker(Tracker):
         self.ENABLED = True
 
     def __init__(self, debug):
-        self.debug = debug
+        super(KeyboardTracker, self).__init__(debug)
         self.listener = keyboard.Listener(
             on_press=self.on_press
         )
-        self.ENABLED = True
 
     def track(self):
         self.listener.start()

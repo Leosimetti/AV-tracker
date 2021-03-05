@@ -46,18 +46,15 @@ class MouseTrackingEvent(TrackingEvent):
 class MouseTracker(Tracker):
 
     def __init__(self, debug):
-        if debug:
-            self.event_dict = {}
+        super(MouseTracker, self).__init__(debug)
         self.move_count = 0
         self.scroll_count = 0
-        self.debug = debug
         self.previous_event = None
         self.listener = mouse.Listener(
             on_move=self.on_move,
             on_click=self.on_click,
             on_scroll=self.on_scroll,
         )
-        self.ENABLED = True
 
     def click_msg(self, event: MouseTrackingEvent):
         self.debug_info(f"Mouse was clicked at {event.timestamp}!")

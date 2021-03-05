@@ -198,10 +198,11 @@ class PythonicVideoTracker(Tracker):
         return arr
 
     def __init__(self, source, debug, models):
+        super(PythonicVideoTracker, self).__init__(debug)
+        self.PROCESS_EVENTS = False
         # self.available_cams = self.find_available_cams()
         self.source = source
         self.models = models
-        self.debug = debug
         self.processor = VideoProcessor(models=self.models, debug=self.debug)
         self.cam = LockedCamera(self.source,
                                 preprocess=self.processor.preprocess
