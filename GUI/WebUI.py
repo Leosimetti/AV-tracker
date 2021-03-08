@@ -99,5 +99,5 @@ class WebWindow:
             # return Response("")
 
         # call the 'run' method
-        webbrowser.open('http://127.0.0.1:5000/ ', new=2)
+        webbrowser.open('http://127.0.0.1:5000/', new=2)
         app.run()
