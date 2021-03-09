@@ -6,8 +6,7 @@ Lean Software Development course project that determines the user's current stat
 User interface is implemented as a web page. User can adjust FPS of the webcam, timer control as well as turn off/on mouse, keyboard and video tracking. In addition, user can also change camera that is being used. Web page shows user state based on keyboard&mouse input and video feed.
 
 
-![image](https://user-images.githubusercontent.com/42554566/110464381-a51ea280-8105-11eb-977d-fea3c3e76523.png)
-
+![image](https://user-images.githubusercontent.com/42554566/110465077-8c62bc80-8106-11eb-92e0-589bd880b7a0.png)
 
 ### Stored information
 
