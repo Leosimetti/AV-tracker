@@ -7,7 +7,7 @@ User interface is implemented as a web page. User can adjust FPS of the webcam, 
 
 *It also has a built-in radio "Vanya" as the killer-feature.*
 
-![image](https://user-images.githubusercontent.com/42554566/110354069-596aeb00-806a-11eb-8db4-6987656be0ea.png)
+![image](https://user-images.githubusercontent.com/42554566/110464381-a51ea280-8105-11eb-977d-fea3c3e76523.png)
 
 
 ### Stored information
