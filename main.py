@@ -13,14 +13,38 @@ from models.DNN_model import DNNModel
 from models.Keras_pb_model import KerasPBModel
 from GUI.WebUI import WebWindow
 import os
+import threading
 
 # for Linux (maybe even MacOS):
 # sudo pyinstaller main.py --noconsole --onefile --add-data GUI:GUI --exclude-module tensorflow
 # for windows:
 # pyinstaller main.py --noconsole --onefile --add-data "GUI;GUI" --exclude-module tensorflow
 
+def tray_icon():
+    import pystray
+    from pystray import MenuItem as item
+    import webbrowser
+
+    icon = pystray.Icon('test name')
+
+    from PIL import Image, ImageDraw
+    import requests
+
+
+    def action():
+        webbrowser.open('http://127.0.0.1:5000/', new=2)
+
+
+    def ext():
+        os._exit(0)
+
+    # Generate an image
+    image = Image.open(requests.get("https://avatars.githubusercontent.com/u/23629166?s=200&v=4", stream=True).raw)
+    menu = (item('Open interface', action), item('Exit', ext))
+    icon = pystray.Icon("icon", image, "A/V tracker", menu)
+    icon.run()
+
 DEBUG = True
-USE_GUI = not True
 
 if __name__ == "__main__":
     if not os.path.exists("db"):
@@ -51,4 +75,12 @@ if __name__ == "__main__":
         mouse_tracker=mouse_tracker,
         kb_tracker=kb_tracker
     )
+
+    threading.Thread(
+        target=tray_icon,
+        daemon=True
+    ).start()
+
     w.create_window()
+
+

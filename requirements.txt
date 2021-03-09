@@ -8,3 +8,4 @@ flaskwebgui==0.1.13
 pcv==0.0.2
 Pillow==8.1.0
 pynput==1.7.3
+pystray
