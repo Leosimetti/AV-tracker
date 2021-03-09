@@ -15,7 +15,7 @@ from GUI.WebUI import WebWindow
 import os
 
 # for Linux (maybe even MacOS):
-# sudo pyinstaller main.py --noconsole --onefile --add-data GUI:GUI --exclude-module tensorflow
+# sudo pyinstaller main.py --noconsole --onefile --add-data GUI:GUI --hidden-import="pynput" --exclude-module tensorflow
 # for windows:
 # pyinstaller main.py --noconsole --onefile --add-data "GUI;GUI" --exclude-module tensorflow
 
