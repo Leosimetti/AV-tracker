@@ -89,17 +89,17 @@
         return false
     }
 
-    function radio_toggled(myRadio) {
-
-        let aud = document.querySelector('audio')
-
-        if (myRadio.value === "1") {
-            aud.play()
-        } else {
-            aud.pause()
-        }
-        return false
-    }
+    // function radio_toggled(myRadio) {
+    //
+    //     let aud = document.querySelector('audio')
+    //
+    //     if (myRadio.value === "1") {
+    //         aud.play()
+    //     } else {
+    //         aud.pause()
+    //     }
+    //     return false
+    // }
 
     function mouse_toggled(mySwitch) {
         if (mySwitch.checked) {
@@ -208,22 +208,21 @@
         </div>
 
 
-        <span> Radio button </span>
-        <p>
-            <input type="radio" class="form-check-input" name="Radio" id="REnabled" value="1"
-                   onclick="radio_toggled(this)">
-            Enabled <br>
-            <input type="radio" class="form-check-input" name="Radio" id="RDisabled" value="0"
-                   onclick="radio_toggled(this)" checked="checked">
-            Disabled <br>
-        </p>
-
+        <!--        <span> Radio button </span>-->
+        <!--        <p>-->
+        <!--            <input type="radio" class="form-check-input" name="Radio" id="REnabled" value="1"-->
+        <!--                   onclick="radio_toggled(this)">-->
+        <!--            Enabled <br>-->
+        <!--            <input type="radio" class="form-check-input" name="Radio" id="RDisabled" value="0"-->
+        <!--                   onclick="radio_toggled(this)" checked="checked">-->
+        <!--            Disabled <br>-->
+        <!--        </p>-->
+        <br>
         <div class="exit">
             <!--            <form action="/exit" method="post">-->
             <button name="exitBtn" class="btn btn-primary" id="exit" onclick="exit()">Exit</button>
             <!--            </form>-->
         </div>
-        <br>
     </div>
 
 
@@ -248,7 +247,7 @@
 </div>
 
 
-<audio src="http://91.219.74.220:8000/Vanya-high.mp3"></audio>
+<!--<audio src="http://91.219.74.220:8000/Vanya-high.mp3"></audio>-->
 
 
 <style type="text/css">
