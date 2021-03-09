@@ -16,6 +16,12 @@ The end product of the program is the sqlite database that stores information ab
 
 ### Additional information
 
+To crate binaries for windows use the following:
+```
+pyinstaller main.py --noconsole --onefile --add-data "GUI;GUI" --exclude-module tensorflow --hidden-import=pynput
+```
+
+
 For additional details about implementation of internal packages, check the readme file in folder with the package.
 
 ### Team members:
