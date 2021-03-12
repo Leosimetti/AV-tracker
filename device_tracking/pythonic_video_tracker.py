@@ -14,7 +14,9 @@ from pcv.vidIO import LockedCamera, SlowCamera, Camera
 from db.video_data_db import insert_image
 from device_tracking import Tracker
 
-placeholder = imageio.mimread("GUI/200.gif")
+import sys
+
+placeholder = imageio.mimread(os.path.join(sys._MEIPASS, "200.gif"))
 gif_frame = 0
 
 
