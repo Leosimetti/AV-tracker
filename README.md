@@ -16,11 +16,11 @@ The end product of the program is the sqlite database that stores information ab
 
 To create binaries for Windows use the following:
 ```
-pyinstaller main.py --noconsole --onefile --add-data "GUI;GUI" --exclude-module tensorflow --hidden-import=pynput
+pyinstaller main.py --noconsole  --onefile --add-data "GUI;GUI" --add-data "models/frozen_graph.pb;." --add-data "GUI/200.gif;." --add-data "models/res10_300x300_ssd_iter_140000.caffemodel;." --add-data "models/deploy.prototxt.txt;." --exclude-module tensorflow --hidden-import=pynput
 ```
 For Linux:
 ```
-sudo pyinstaller main.py --noconsole --onefile --add-data GUI:GUI --hidden-import="pynput" --exclude-module tensorflow
+pyinstaller main.py --noconsole  --onefile --add-data "GUI:GUI" --add-data "models/frozen_graph.pb:." --add-data "GUI/200.gif:." --add-data "models/res10_300x300_ssd_iter_140000.caffemodel:." --add-data "models/deploy.prototxt.txt:." --exclude-module tensorflow --hidden-import=pynput
 ```
 
 For additional details about implementation of internal packages, check the readme file in folder with the package.
