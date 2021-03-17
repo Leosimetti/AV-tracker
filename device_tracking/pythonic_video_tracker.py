@@ -206,6 +206,7 @@ class PythonicVideoTracker(Tracker):
         self.models = models
         self.processor = VideoProcessor(models=self.models, debug=self.debug)
         self.cam = LockedCamera(self.source,
+                                apiPreference=cv2.CAP_DSHOW,
                                 preprocess=self.processor.preprocess
                                 )
         self.processor.set_cam(self.cam)

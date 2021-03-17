@@ -147,3 +147,4 @@ dmypy.json
 data2.zip
 db/signals.sqlite-journal
 data3.zip
+python-3.8.8-embed-win32.zip

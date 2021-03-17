@@ -9,6 +9,7 @@ from db.video_data_db import *
 from device_tracking.mouse_tracker import MouseTracker
 from device_tracking.keyboard_tracker import KeyboardTracker
 from device_tracking.pythonic_video_tracker import PythonicVideoTracker
+from device_tracking.windows_video_tracker import WindowsVideoTracker
 from models.DNN_model import DNNModel
 from models.Keras_pb_model import KerasPBModel
 from GUI.WebUI import WebWindow
@@ -40,7 +41,7 @@ if __name__ == "__main__":
     timer.start()
 
     # Video tracker
-    video_tracker = PythonicVideoTracker(
+    video_tracker = WindowsVideoTracker(
         source=0,
         debug=DEBUG,
         models=[DNNModel(DEBUG), KerasPBModel(DEBUG)]
