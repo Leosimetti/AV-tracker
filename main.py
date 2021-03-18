@@ -33,7 +33,7 @@ if __name__ == "__main__":
         subprocess.run(["cam2web.exe", "/start", "/minimize"])
 
 
-    thread = threading.Thread(target=run_cam)
+    thread = threading.Thread(target=run_cam, daemon=True)
     thread.start()
 
     prepare_signal_db()
@@ -55,7 +55,7 @@ if __name__ == "__main__":
 
     # Video tracker
     video_tracker = PythonicVideoTracker(
-        source="http://192.168.31.5:8000/camera/mjpeg",
+        source="http://127.0.0.1:8000/camera/mjpeg",
         debug=DEBUG,
         models=[DNNModel(DEBUG), KerasPBModel(DEBUG)]
     )
