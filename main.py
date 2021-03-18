@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
     # Video tracker
     video_tracker = WindowsVideoTracker(
-        source=0,
+        source=2,
         debug=DEBUG,
         models=[DNNModel(DEBUG), KerasPBModel(DEBUG)]
     )

@@ -1,5 +1,5 @@
 from device_tracking.pythonic_video_tracker import PythonicVideoTracker, placeholder_stream, VideoProcessor
-from pygrabber.dshow_graph import FilterGraph
+# from pygrabber.dshow_graph import FilterGraph
 import queue
 import cv2
 
@@ -7,17 +7,17 @@ class Camera:
 
     def __init__(self, source):
         self.source = source
-        self.graph = FilterGraph()
-        self.graph.add_video_input_device(source)
-        self.graph.add_sample_grabber(lambda image: self.buffer.put(image))
-        self.graph.add_null_render()
-        self.graph.prepare_preview_graph()
-        self.graph.run()
-        self.buffer = queue.Queue(1)
+        # self.graph = FilterGraph()
+        # self.graph.add_video_input_device(source)
+        # # self.graph.add_sample_grabber(lambda image: self.buffer.put(image))
+        # self.graph.add_null_render()
+        # self.graph.prepare_preview_graph()
+        # self.graph.run()
+        self.buffer = queue.Queue(10)
         # self.buffer.maxsize = 5
 
     def grab(self):
-        self.graph.grab_frame()
+        pass
 
 class WindowsVideoTracker(PythonicVideoTracker):
 

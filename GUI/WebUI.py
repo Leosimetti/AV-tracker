@@ -74,6 +74,25 @@ class WebWindow:
             bool_to_state = {False: "Present", True: "Absent"}
             return bool_to_state[Timer.time_left < 1]
 
+        @app.route('/upload', methods=['POST'])
+        def blyat():
+            import base64
+            import cv2
+            import numpy as np
+
+            def readb64(uri):
+                encoded_data = uri.split(b',')[1].decode()
+                nparr = np.fromstring(base64.b64decode(encoded_data), np.uint8)
+                img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                return img
+            img = readb64(request.data)
+            # cv2.imshow("SAS", img)
+            self.video_tracker.cam.buffer.put(img)
+            # cv2.waitKey()
+            # print(img)
+            # print()
+            return "Good"
+
         @app.route('/change_fps', methods=['POST'])
         def change_fps():
             print(int(request.values['fps']))
