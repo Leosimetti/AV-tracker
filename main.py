@@ -14,6 +14,7 @@ from models.Keras_pb_model import KerasPBModel
 from GUI.WebUI import WebWindow
 import subprocess
 import os
+import sys
 
 # for Linux (maybe even MacOS):
 # sudo pyinstaller main.py --noconsole --onefile --add-data GUI:GUI --hidden-import="pynput" --exclude-module tensorflow
@@ -27,8 +28,10 @@ if __name__ == "__main__":
     if not os.path.exists("db"):
         os.mkdir("db")
 
+
     def run_cam():
         subprocess.run(["cam2web.exe", "/start", "/minimize"])
+
 
     thread = threading.Thread(target=run_cam)
     thread.start()
@@ -47,8 +50,9 @@ if __name__ == "__main__":
     timer.start()
 
     import time
+
     time.sleep(3)
-    
+
     # Video tracker
     video_tracker = PythonicVideoTracker(
         source="http://192.168.31.5:8000/camera/mjpeg",
