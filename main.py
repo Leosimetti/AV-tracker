@@ -12,6 +12,7 @@ from device_tracking.pythonic_video_tracker import PythonicVideoTracker
 from models.DNN_model import DNNModel
 from models.Keras_pb_model import KerasPBModel
 from GUI.WebUI import WebWindow
+import subprocess
 import os
 
 # for Linux (maybe even MacOS):
@@ -26,6 +27,12 @@ if __name__ == "__main__":
     if not os.path.exists("db"):
         os.mkdir("db")
 
+    def run_cam():
+        subprocess.run(["cam2web.exe", "/start", "/minimize"])
+
+    thread = threading.Thread(target=run_cam)
+    thread.start()
+
     prepare_signal_db()
     prepare_imageDB()
     prepare_processed_signalDB()
@@ -39,9 +46,12 @@ if __name__ == "__main__":
     timer = threading.Thread(target=Timer.start_timer, daemon=True)
     timer.start()
 
+    import time
+    time.sleep(3)
+    
     # Video tracker
     video_tracker = PythonicVideoTracker(
-        source=0,
+        source="http://192.168.31.5:8000/camera/mjpeg",
         debug=DEBUG,
         models=[DNNModel(DEBUG), KerasPBModel(DEBUG)]
     )
