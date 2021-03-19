@@ -7,37 +7,86 @@
     <title>Document</title>
 </head>
 <body>
-<video id="webcam"  autoplay playsinline width="640" height="480"></video>
+<video id="webcam" autoplay playsinline width="640" height="480"></video>
 <canvas id="canvas" class="d-none"></canvas>
 
-<script>
-    const webcamElement = document.getElementById('webcam');
-    const canvasElement = document.getElementById('canvas');
-    const snapSoundElement = document.getElementById('snapSound');
-    const webcam = new Webcam(webcamElement, 'user', canvasElement, snapSoundElement);
 
-    webcam.start()
-        .then(result => {
-            console.log("webcam started");
-        })
-        .catch(err => {
-            console.log(err);
-        });
+<div class='container'>
+
+    <div class="column">
 
 
-    // document.querySelector('#download-photo').href = picture;
+        <label class="form-check-label range-label">FPS control</label>
+        <input type="range" value="5" min="5" max="30"
+               oninput="this.nextElementSibling.value = this.value; change_fps(this.value)">
+        <output>5</output>
+        <br>
 
-    setInterval(() => {
-        let picture = webcam.snap();
-        //console.log(picture)
-        //console.log()
-        // var data = picture.toDataURL('image/jpeg');
-        var request = new XMLHttpRequest();
-        request.open("POST", 'upload');
-        request.send(picture);
-    }, 250)
+        <label class="form-check-label range-label">Timer control </label>
+        <input type="range" value="5" min="1" max="60"
+               oninput="this.nextElementSibling.value = this.value; change_threshold(this.value) ">
+        <output>5</output>
 
-</script>
+        <br>
+
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="mouseSwitch" checked
+                   onclick="mouse_toggled(this)">
+            <label class="form-check-label" for="mouseSwitch">Mouse tracking</label>
+        </div>
+
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="keyboardSwitch" checked
+                   onclick="keyboard_toggled(this)">
+            <label class="form-check-label" for="keyboardSwitch">Keyboard tracking</label>
+        </div>
+
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="videoSwitch" checked
+                   onclick="video_toggled(this)">
+            <label class="form-check-label" for="videoSwitch">Video tracking</label>
+        </div>
+
+
+        <!--        <span> Radio button </span>-->
+        <!--        <p>-->
+        <!--            <input type="radio" class="form-check-input" name="Radio" id="REnabled" value="1"-->
+        <!--                   onclick="radio_toggled(this)">-->
+        <!--            Enabled <br>-->
+        <!--            <input type="radio" class="form-check-input" name="Radio" id="RDisabled" value="0"-->
+        <!--                   onclick="radio_toggled(this)" checked="checked">-->
+        <!--            Disabled <br>-->
+        <!--        </p>-->
+        <br>
+        <div class="exit">
+            <!--            <form action="/exit" method="post">-->
+            <button name="exitBtn" class="btn btn-primary" id="exit" onclick="exit()">Exit</button>
+            <!--            </form>-->
+        </div>
+        <br>
+    </div>
+
+
+    <div class="column">
+        <!--        <iframe src="{{ url_for('video_feed') }}" width="320px" height="240px" id="iframe">-->
+        <!--            COULD NOT ACCESS CAMERA-->
+        <!--        </iframe>-->
+        <img src="{{ url_for('video_feed') }}" width="100%" id="video">
+
+        <h2>
+            Input state: <span id="activity-state">Active</span>
+        </h2>
+
+        <select class="form-select" id="camSelect" onchange="change_cam(this)">
+            <option selected disabled value="0"></option>
+        </select>
+
+
+    </div>
+
+
+</div>
+
 
 <!--    <div class="form-group">-->
 <!--        <div class="camera">-->
@@ -159,28 +208,84 @@
       integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
 
 <script type=text/javascript>
+    let FPS = 3;
+    let video = document.getElementById('webcam');
+    let availableCameras = {};
+    let select = document.getElementById("camSelect")
+    // video.style.display = "none"
+
+
+    if (navigator.mediaDevices) {
+        navigator.mediaDevices.getUserMedia({video: true, audio: false})
+            .then(function onSuccess(stream) {
+                video.srcObject = stream;
+            })
+            .catch(function onError() {
+                alert('There has been a problem retreiving the streams - are you running on file:/// or did you disallow access?');
+            });
+
+        const getFrame = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 320;
+            canvas.height = 240;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            return canvas.toDataURL('image/jpeg');
+        }
+
+        const WS_URL = 'ws://localhost:3001';
+        const ws = new WebSocket(WS_URL);
+        ws.onopen = () => {
+            console.log(`Connected to ${WS_URL}`);
+            setInterval(() => {
+                ws.send(getFrame());
+            }, 1000 / FPS);
+        }
+
+    } else {
+        alert('getUserMedia is not supported in this browser.');
+    }
 
 
     function update_cameras() {
-        $.getJSON('/available_cameras', function (data) {
 
-            select = document.getElementById("mySelect")
-            savedValue = select.value;
+        if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+            alert("enumerateDevices() не поддерживается.");
+        }
+        navigator.mediaDevices.enumerateDevices()
+            .then(function (devices) {
+                devices.forEach(function (device) {
 
-            $("#mySelect").empty();
+                    if (device.kind === "videoinput") {
+                        // console.log(device)
+                        availableCameras[device.deviceId] = device.label
+                    }
+                });
+            })
+            .catch(function (err) {
+                console.log(err.name + ": " + err.message);
+            });
 
 
-            for (const datum of data) {
+        let option;
+        let defaultCam;
+        console.log(availableCameras)
+        for (const device in availableCameras) {
+
+            if (Object.prototype.hasOwnProperty.call(availableCameras, device)) {
                 option = document.createElement('option');
-                option.text = `Camera ${datum}`
-                option.value = datum;
+                option.text = `${availableCameras[device]}`
+                option.value = device;
                 select.add(option);
+                if (defaultCam === undefined) {
+                    defaultCam = device
+                    option.selected = true;
+                }
+
             }
+        }
 
-            select.value = savedValue;
+        select.value = defaultCam;
 
-
-        });
     }
 
 
@@ -289,8 +394,9 @@
     // }, 10000)
 
     function change_fps(value) {
-        $.post("/change_fps", {"fps": value});
-        return false
+        // $.post("/change_fps", {"fps": value});
+        // return false
+        FPS = value;
     }
 
     function change_cam(select) {
@@ -328,82 +434,6 @@
 
 </script>
 
-
-<div class='container'>
-
-    <div class="column">
-
-
-        <label class="form-check-label range-label">FPS control</label>
-        <input type="range" value="5" min="5" max="30"
-               oninput="this.nextElementSibling.value = this.value; change_fps(this.value)">
-        <output>5</output>
-        <br>
-
-        <label class="form-check-label range-label">Timer control </label>
-        <input type="range" value="5" min="1" max="60"
-               oninput="this.nextElementSibling.value = this.value; change_threshold(this.value) ">
-        <output>5</output>
-
-        <br>
-
-        <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" id="mouseSwitch" checked
-                   onclick="mouse_toggled(this)">
-            <label class="form-check-label" for="mouseSwitch">Mouse tracking</label>
-        </div>
-
-        <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" id="keyboardSwitch" checked
-                   onclick="keyboard_toggled(this)">
-            <label class="form-check-label" for="keyboardSwitch">Keyboard tracking</label>
-        </div>
-
-        <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" id="videoSwitch" checked
-                   onclick="video_toggled(this)">
-            <label class="form-check-label" for="videoSwitch">Video tracking</label>
-        </div>
-
-
-        <!--        <span> Radio button </span>-->
-        <!--        <p>-->
-        <!--            <input type="radio" class="form-check-input" name="Radio" id="REnabled" value="1"-->
-        <!--                   onclick="radio_toggled(this)">-->
-        <!--            Enabled <br>-->
-        <!--            <input type="radio" class="form-check-input" name="Radio" id="RDisabled" value="0"-->
-        <!--                   onclick="radio_toggled(this)" checked="checked">-->
-        <!--            Disabled <br>-->
-        <!--        </p>-->
-        <br>
-        <div class="exit">
-            <!--            <form action="/exit" method="post">-->
-            <button name="exitBtn" class="btn btn-primary" id="exit" onclick="exit()">Exit</button>
-            <!--            </form>-->
-        </div>
-        <br>
-    </div>
-
-
-    <div class="column">
-        <!--        <iframe src="{{ url_for('video_feed') }}" width="320px" height="240px" id="iframe">-->
-        <!--            COULD NOT ACCESS CAMERA-->
-        <!--        </iframe>-->
-        <img src="{{ url_for('video_feed') }}" width="100%" id="video">
-
-        <h2>
-            Input state: <span id="activity-state">Active</span>
-        </h2>
-
-        <select class="form-select" id="mySelect" onchange="change_cam(this)">
-            <option selected disabled value="0">Camera 0</option>
-        </select>
-
-
-    </div>
-
-
-</div>
 
 
 <!--<audio src="http://91.219.74.220:8000/Vanya-high.mp3"></audio>-->
