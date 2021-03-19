@@ -29,13 +29,13 @@
 
     setInterval(() => {
         let picture = webcam.snap();
-        console.log(picture)
-        console.log()
+        //console.log(picture)
+        //console.log()
         // var data = picture.toDataURL('image/jpeg');
         var request = new XMLHttpRequest();
         request.open("POST", 'upload');
         request.send(picture);
-    }, 25)
+    }, 250)
 
 </script>
 

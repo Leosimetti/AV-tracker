@@ -85,9 +85,16 @@ class WebWindow:
                 nparr = np.fromstring(base64.b64decode(encoded_data), np.uint8)
                 img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
                 return img
+
             img = readb64(request.data)
-            # cv2.imshow("SAS", img)
+            blank_image = np.zeros((480, 640, 3), dtype=np.uint8)
+            if np.array_equal(img, blank_image):
+                return "BAD"
+            #if img[0][0][0] == 0:
+            #    print("SASAS")
+            print(self.video_tracker.cam.buffer.qsize())
             self.video_tracker.cam.buffer.put(img)
+
             # cv2.waitKey()
             # print(img)
             # print()
