@@ -95,14 +95,14 @@
 <!-- CSS only -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
       integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
-<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.0/socket.io.js" crossorigin="anonymous"></script>
+<!--<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.0/socket.io.js" crossorigin="anonymous"></script>-->
 
 <script type=text/javascript>
     let FPS = 5;
     let video = document.getElementById('webcam');
     let availableCameras = {};
     let select = document.getElementById("camSelect")
-    var socket = io();
+    // var socket = io();
     let interval;
 
     navigator.mediaDevices
@@ -116,6 +116,7 @@
 
     // video.style.display = "none"
     start_video()
+    change_fps(5)
 
     function getFrame() {
         const canvas = document.createElement('canvas');
@@ -127,10 +128,16 @@
 
 
     function transferImage() {
-        socket.emit('video_frame', {data: getFrame()});
+
+        toggler = document.querySelector("#videoSwitch")
+
+        if (toggler.checked) {
+            var request = new XMLHttpRequest();
+            request.open("POST", 'upload');
+            request.send(getFrame());
+        }
+        // socket.emit('video_frame', {data: getFrame()});
     }
-
-
 
 
     function start_video() {
@@ -144,12 +151,12 @@
                 });
 
 
-            socket = io();
-            interval = setInterval(transferImage, 1000 / FPS);
-            socket.on('connect', function () {
-                document.querySelector("#videoSwitch").disabled = false;
-                // socket.emit('my event', {data: 'I\'m connected!'});
-            });
+            // socket = io();
+            // interval = setInterval(transferImage, 1000 / FPS);
+            // socket.on('connect', function () {
+            //     document.querySelector("#videoSwitch").disabled = false;
+            //     // socket.emit('my event', {data: 'I\'m connected!'});
+            // });
 
 
         } else {
@@ -180,15 +187,16 @@
         if (mySwitch.checked) {
             start_video()
         } else {
-            socket.close()
+            // socket.close()
             video.srcObject.getTracks().forEach(function (track) {
                 track.stop();
             });
 
-            setTimeout(() => {
-                mySwitch["disabled"] = false
-            }, 4000);
         }
+
+        setTimeout(() => {
+            mySwitch["disabled"] = false
+        }, 4000);
 
     }
 
@@ -331,7 +339,6 @@
     // update_cameras();
 
 </script>
-
 
 
 <!--<audio src="http://91.219.74.220:8000/Vanya-high.mp3"></audio>-->

@@ -9,12 +9,13 @@ from db.timer import Timer
 import webbrowser
 
 # for socketio
-# import eventlet
-# eventlet.monkey_patch()
 
 
+# from gevent import monkey
+# monkey.patch_all()
+# from gevent.pywsgi import WSGIServer
 
-
+# from engineio.async_drivers import gevent
 # http://fm.1tvcrimea.ru:8000/stream.mp3
 # http://91.219.74.220:8000/Vanya-high.mp3
 
@@ -32,7 +33,7 @@ class WebWindow:
         app = Flask(__name__)
         app.config['SECRET_KEY'] = 'secret!'
 
-        socketio = SocketIO(app)
+        # socketio = SocketIO(app)
 
         @app.route('/video_feed')
         def video_feed():
@@ -84,20 +85,20 @@ class WebWindow:
             bool_to_state = {False: "Present", True: "Absent"}
             return bool_to_state[Timer.time_left < 1]
 
-        @socketio.on('video_frame')
-        def get_frame(data):
+        @app.route('/upload', methods=['POST'])
+        def get_frame():
             import base64
             import cv2
             import numpy as np
 
             def readb64(uri):
-                encoded_data = uri.split(',')[1]
+                encoded_data = uri.split(b',')[1].decode()
                 nparr = np.fromstring(base64.b64decode(encoded_data), np.uint8)
                 img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
                 return img
 
-            data = data['data']
-            img = readb64(data)
+            # data = data['data']
+            img = readb64(request.data)
             blank_image = np.zeros((480, 640, 3), dtype=np.uint8)
             if np.array_equal(img, blank_image):
                 return "BAD"
@@ -136,5 +137,7 @@ class WebWindow:
         # call the 'run' method
 
         webbrowser.open_new('http://127.0.0.1:5000/')
-        # app.run()
-        socketio.run(app, host="127.0.0.1", port=5000, debug=False)
+        app.run()
+        # http_server = WSGIServer(('127.0.0.1', 5000), app)
+        # http_server.serve_forever()
+        # socketio.run(app, host="127.0.0.1", port=5000, debug=False)

@@ -1,5 +1,8 @@
 #!/usr/bin/sudo python3
 
+# import eventlet
+# eventlet.monkey_patch()
+
 import threading
 
 from db.processed_signals_db import *
