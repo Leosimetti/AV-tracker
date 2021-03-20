@@ -5,6 +5,12 @@ import cv2
 
 class Camera:
 
+    def put_image(self, image):
+        try:
+            self.buffer.put_nowait(image)
+        except queue.Full:
+            pass
+
     def __init__(self, source):
         self.source = source
         # self.graph = FilterGraph()
@@ -13,7 +19,7 @@ class Camera:
         # self.graph.add_null_render()
         # self.graph.prepare_preview_graph()
         # self.graph.run()
-        self.buffer = queue.Queue(10)
+        self.buffer = queue.Queue(1)
         # self.buffer.maxsize = 5
 
     def grab(self):

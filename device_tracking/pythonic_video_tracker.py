@@ -38,7 +38,7 @@ placeholder_stream = stream_placeholder()
 
 class VideoProcessor:
     GIF_LENGTH = 10
-    FPS = 5
+    # FPS = 5
 
     def __init__(self, models, debug):
         super(VideoProcessor, self).__init__()
@@ -165,9 +165,9 @@ class VideoProcessor:
                 print(f"[{resulting_state}] {timestamp}")
         self.previous_state = resulting_state
 
-        start = time.perf_counter()
-        while time.perf_counter() - start < 1 / self.FPS:
-            self._cam.grab()
+        # start = time.perf_counter()
+        # while time.perf_counter() - start < 1 / self.FPS:
+        #     self._cam.grab()
 
         if self.debug:
             return debug_image[PICTURE_TO_CHOOSE]

@@ -1,11 +1,18 @@
 import json
 
 from flask import Flask, render_template, Response, request
+from flask_socketio import SocketIO
 # from flaskwebgui import FlaskUI
 import time
 import os
 from db.timer import Timer
 import webbrowser
+
+# for socketio
+# import eventlet
+# eventlet.monkey_patch()
+
+
 
 
 # http://fm.1tvcrimea.ru:8000/stream.mp3
@@ -23,6 +30,9 @@ class WebWindow:
 
     def create_window(self):
         app = Flask(__name__)
+        app.config['SECRET_KEY'] = 'secret!'
+
+        socketio = SocketIO(app)
 
         @app.route('/video_feed')
         def video_feed():
@@ -74,37 +84,36 @@ class WebWindow:
             bool_to_state = {False: "Present", True: "Absent"}
             return bool_to_state[Timer.time_left < 1]
 
-        @app.route('/upload', methods=['POST'])
-        def blyat():
+        @socketio.on('video_frame')
+        def get_frame(data):
             import base64
             import cv2
             import numpy as np
 
             def readb64(uri):
-                encoded_data = uri.split(b',')[1].decode()
+                encoded_data = uri.split(',')[1]
                 nparr = np.fromstring(base64.b64decode(encoded_data), np.uint8)
                 img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
                 return img
 
-            img = readb64(request.data)
+            data = data['data']
+            img = readb64(data)
             blank_image = np.zeros((480, 640, 3), dtype=np.uint8)
             if np.array_equal(img, blank_image):
                 return "BAD"
-            #if img[0][0][0] == 0:
-            #    print("SASAS")
             print(self.video_tracker.cam.buffer.qsize())
-            self.video_tracker.cam.buffer.put(img)
+            self.video_tracker.cam.put_image(img)
 
             # cv2.waitKey()
             # print(img)
             # print()
             return "Good"
 
-        @app.route('/change_fps', methods=['POST'])
-        def change_fps():
-            print(int(request.values['fps']))
-            self.video_tracker.processor.FPS = int(request.values['fps'])
-            return Response("Changed FPS")
+        # @app.route('/change_fps', methods=['POST'])
+        # def change_fps():
+        #     print(int(request.values['fps']))
+        #     self.video_tracker.processor.FPS = int(request.values['fps'])
+        #     return Response("Changed FPS")
 
         @app.route('/change_cam', methods=['POST'])
         def change_cam():
@@ -125,5 +134,7 @@ class WebWindow:
             # return Response("")
 
         # call the 'run' method
+
         webbrowser.open_new('http://127.0.0.1:5000/')
-        app.run()
+        # app.run()
+        socketio.run(app, host="127.0.0.1", port=5000, debug=False)

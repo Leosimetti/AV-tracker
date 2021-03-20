@@ -8,6 +8,7 @@ from db.processed_signals_db import insert_processed_data
 
 
 class Timer:
+    frequency = 1
     threshold = 5
     time_left = 5
     is_absent = True
@@ -43,7 +44,7 @@ class Timer:
             if cls.time_left > 0:
                 cls.is_over = False
             while cls.time_left > 0:
-                time.sleep(0.1)
-                cls.time_left -= 0.1
+                time.sleep(cls.frequency)
+                cls.time_left -= cls.frequency
             if not cls.is_absent:
                 cls.is_absent = True
