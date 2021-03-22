@@ -1,19 +1,20 @@
 import sqlite3
-import queue
 from db.timer import Timer
+import os
 
 
 def prepare_signal_db():
-    conn = sqlite3.connect('db/signals.sqlite')
-    cursor = conn.cursor()
+    if not os.path.exists('db/signals.sqlite'):
+        conn = sqlite3.connect('db/signals.sqlite')
+        cursor = conn.cursor()
 
-    cursor.execute("DROP TABLE IF EXISTS signals;")
-    cursor.execute(
-        "CREATE TABLE signals "
-        "( id INTEGER PRIMARY KEY AUTOINCREMENT,dateTime TEXT, deviceType VARCHAR(1), actionType TEXT);")
+        cursor.execute("DROP TABLE IF EXISTS signals;")
+        cursor.execute(
+            "CREATE TABLE signals "
+            "( id INTEGER PRIMARY KEY AUTOINCREMENT,dateTime TEXT, deviceType VARCHAR(1), actionType TEXT);")
 
-    conn.commit()
-    conn.close()
+        conn.commit()
+        conn.close()
 
 
 def insert_data(data):
