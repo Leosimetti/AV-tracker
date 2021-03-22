@@ -6,8 +6,10 @@ from PIL import Image
 import sys
 
 class DNNModel(Model):
-    MODEL_FILE = os.path.join(sys._MEIPASS, "res10_300x300_ssd_iter_140000.caffemodel")
-    CONFIG_FILE = os.path.join(sys._MEIPASS, "deploy.prototxt.txt")
+    MODEL_FILE = os.path.join("models", "res10_300x300_ssd_iter_140000.caffemodel")
+    # MODEL_FILE = os.path.join(sys._MEIPASS, "res10_300x300_ssd_iter_140000.caffemodel")
+    CONFIG_FILE = os.path.join("models", "deploy.prototxt.txt")
+    # CONFIG_FILE = os.path.join(sys._MEIPASS, "deploy.prototxt.txt")
 
     def __init__(self, debug):
         self.debug = debug

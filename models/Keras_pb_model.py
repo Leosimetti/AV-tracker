@@ -9,7 +9,8 @@ import sys
 
 class KerasPBModel(Model):
 
-    MODEL_FILE = os.path.join(sys._MEIPASS, "frozen_graph.pb")
+    MODEL_FILE = os.path.join("models", "frozen_graph.pb")
+    # MODEL_FILE = os.path.join(sys._MEIPASS, "frozen_graph.pb")
 
     def __init__(self, debug):
         self.debug = debug
