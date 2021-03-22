@@ -30,9 +30,10 @@ if __name__ == "__main__":
     if not os.path.exists("db"):
         os.mkdir("db")
 
-    prepare_signal_db()
-    prepare_imageDB()
-    prepare_processed_signalDB()
+    if not os.path.exists('db/signals.sqlite'):
+        prepare_signal_db()
+        prepare_imageDB()
+        prepare_processed_signalDB()
 
     kb_tracker = KeyboardTracker(DEBUG)
     kb_tracker.track()
