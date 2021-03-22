@@ -16,8 +16,8 @@ from device_tracking import Tracker
 
 import sys
 
-placeholder = imageio.mimread(os.path.join("GUI", "200.gif"))
-# placeholder = imageio.mimread(os.path.join(sys._MEIPASS, "200.gif"))
+# placeholder = imageio.mimread(os.path.join("GUI", "200.gif"))
+placeholder = imageio.mimread(os.path.join(sys._MEIPASS, "200.gif"))
 gif_frame = 0
 
 
